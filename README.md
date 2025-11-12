@@ -1,1 +1,1 @@
-# personal-notes-assistant-cli
+"Personal assistant" cli bot
