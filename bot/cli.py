@@ -1,6 +1,7 @@
 from bot.commands import handle_command
 from bot.models import Notes
 
+
 def run_bot():
     # TODO: add saving notes to disk
     notes = Notes()
