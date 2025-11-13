@@ -17,3 +17,5 @@ ENV/
 
 .vscode/
 .idea/
+
+data/users.json

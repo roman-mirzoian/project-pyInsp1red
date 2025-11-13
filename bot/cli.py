@@ -4,55 +4,47 @@ from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.key_binding import KeyBindings
 from bot.commands import handle_command
+from bot.models import Notes
+from bot.utils import print_help
 
 def run_bot():
 
-    # Create some history first.
-    history = InMemoryHistory()
-    history.append_string("add")
-    history.append_string("change")
-    history.append_string("phone")
-    history.append_string("all")
-    history.append_string("add-birthday")
-    history.append_string("show-birthday")
-    history.append_string("birthdays")
-
     # Define the completer with possible commands.
-    compleater = WordCompleter(
-        ["hello", "add", "change", "phone", "all", "add-birthday", "show-birthday", "birthdays", "exit", "close"],
+    completer = WordCompleter(
+        [
+            "hello", 
+            "add", 
+            "add-birthday", 
+            "add-email", 
+            "add-address",
+            "all", 
+            "add-note", 
+            "edit-note",
+            "find-notes",
+            "all-notes",
+            "delete-note", 
+            "close",
+            "exit"
+        ],
     )
-    # Define key bindings.
-    bindings = KeyBindings()
-
-    # Handle the Enter key.
-    @bindings.add('enter')
-    def _(event):
-        buffer = event.current_buffer
-        if buffer.complete_state:
-            buffer.complete_state = None  # Exit completion mode
-        else:
-            buffer.validate_and_handle()  # Accept the input
 
     session = PromptSession(
-        history=history,
+        history=InMemoryHistory(),
         auto_suggest=AutoSuggestFromHistory(),
         enable_history_search=True,
-        completer=compleater,
-        key_bindings=bindings,
+        completer=completer,
     )
-    # Print help.
-    print("This CLI has fish-style auto-suggestion enabled.")
-    print('Type for instance "add", then you\'ll see a suggestion.')
-    print("Press the right arrow to insert the suggestion.")
-    print("Press Control-C to retry. Control-D to exit.")
-    print()
+
+    notes = Notes()
+    
+    print_help()
     try:
         while True:
             user_input = session.prompt(">>> ")
             if not user_input:
                 continue
 
-            result = handle_command(user_input, {}, {})
+            result = handle_command(user_input, {}, notes=notes)
             if result == "exit":
                 # place to save all data
                 print("Good bye!")
