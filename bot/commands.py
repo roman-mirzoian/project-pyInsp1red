@@ -21,7 +21,6 @@ def add_contact(args, book):
         
         record.add_phone(phone)
         return message
-    
     except ValueError as e:
         return f"Error: {e}"
 
