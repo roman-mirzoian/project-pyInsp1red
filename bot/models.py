@@ -1,5 +1,88 @@
 # всі структури даних (Field, Record і так далі)
+
+from datetime import datetime
 from collections import UserDict, defaultdict
+
+
+class Field:
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
+
+class Name(Field):
+    pass
+
+
+class Phone(Field):
+    def __init__(self, value):
+        if len(value) != 10 or not value.isdigit():
+            raise ValueError("Phone must be 10 digits")
+        super().__init__(value)
+
+
+class Birthday(Field):
+    def __init__(self, value):
+        try:
+            parsed_date = datetime.strptime(value, "%d.%m.%Y")
+            super().__init__(parsed_date)
+        except ValueError:
+            raise ValueError("Invalid date format. Use DD.MM.YYYY")
+
+
+class Email(Field):
+    def __init__(self, value):
+        if "@" not in value or "." not in value:
+            raise ValueError("Invalid email format")
+        super().__init__(value)
+
+
+class Address(Field):
+    pass
+
+
+class Record:
+    def __init__(self, name):
+        self.name = Name(name)
+        self.phones = []
+        self.birthday = None
+        self.email = None
+        self.address = None
+
+    def add_phone(self, phone):
+        self.phones.append(Phone(phone))
+
+    def add_birthday(self, birthday):
+        self.birthday = Birthday(birthday)
+
+    def add_email(self, email):
+        self.email = Email(email)
+
+    def add_address(self, address):
+        self.address = Address(address)
+
+    def __str__(self):
+        result = f"Contact name: {self.name.value}"
+        if self.phones:
+            phones_str = "; ".join(p.value for p in self.phones)
+            result += f", phones: {phones_str}"
+        if self.birthday:
+            result += f", birthday: {self.birthday.value.strftime('%d.%m.%Y')}"
+        if self.email:
+            result += f", email: {self.email.value}"
+        if self.address:
+            result += f", address: {self.address.value}"
+        return result
+
+
+class AddressBook(UserDict):
+    def add_record(self, record):
+        self.data[record.name.value] = record
+
+    def find(self, name):
+        return self.data.get(name)
 
 class Notes(UserDict):
     def add_note(self, user_name: str, note: str):

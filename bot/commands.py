@@ -1,11 +1,107 @@
 from bot.utils import parse_input
 from bot.models import Notes
+from bot.models import Record
+
+
+def add_contact(args, book):
+    if len(args) < 2:
+        return "Error: Give me name and phone"
+    
+    name = args[0]
+    phone = args[1]
+    
+    try:
+        record = book.find(name)
+        
+        if record is None:
+            record = Record(name)
+            book.add_record(record)
+            message = "Contact added."
+        else:
+            message = "Contact updated."
+        
+        record.add_phone(phone)
+        return message
+    
+    except ValueError as e:
+        return f"Error: {e}"
+
+
+def add_birthday(args, book):
+    if len(args) < 2:
+        return "Error: Give me name and birthday"
+    
+    name = args[0]
+    birthday = args[1]
+    
+    record = book.find(name)
+    
+    if record is None:
+        return "Error: Contact not found"
+    
+    try:
+        record.add_birthday(birthday)
+        return "Birthday added."
+    except ValueError as e:
+        return f"Error: {e}"
+
+
+def add_email(args, book):
+    if len(args) < 2:
+        return "Error: Give me name and email"
+    
+    name = args[0]
+    email = args[1]
+    
+    record = book.find(name)
+    
+    if record is None:
+        return "Error: Contact not found"
+    
+    try:
+        record.add_email(email)
+        return "Email added."
+    except ValueError as e:
+        return f"Error: {e}"
+
+
+def add_address(args, book):
+    if len(args) < 2:
+        return "Error: Please provide name and address"
+    
+    name = args[0]
+    address = " ".join(args[1:])
+    
+    record = book.find(name)
+    
+    if record is None:
+        return "Error: Contact not found"
+    
+    record.add_address(address)
+    return "Address added."
+
+
+def show_all(book):
+    if not book.data:
+        return "No contacts"
+    
+    result = []
+    for record in book.data.values():
+        result.append(str(record))
+    
+    return "\n".join(result)
+
 
 def handle_command(user_input: str, book, notes: Notes):
     command, *args = parse_input(user_input)
 
     commands = {
         "hello": lambda: "How can I help you?",
+        "add": lambda: add_contact(args, book),
+        "add-birthday": lambda: add_birthday(args, book),
+        "add-email": lambda: add_email(args, book),
+        "add-address": lambda: add_address(args, book),
+        "all": lambda: show_all(book),
         "add-note": lambda: add_note(args, notes),
         "edit-note": lambda: edit_note(args, notes),
         "find-notes": lambda: find_notes(args, notes),
@@ -20,7 +116,8 @@ def handle_command(user_input: str, book, notes: Notes):
     if func:
         return func()
     else:
-        print(f"Invalid command: {command}")
+        return f"Invalid command: {command}"
+
 
 def add_note(args, notes: Notes) -> str:
     user_name, *text = args
