@@ -73,7 +73,7 @@ def add_contact(args, book):
 @input_error
 def add_birthday(args, book):
     name, birthday = args[0], args[1]
-
+    
     record = book.find(name)
 
     if record is None:
