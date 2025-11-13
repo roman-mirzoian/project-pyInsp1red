@@ -28,8 +28,7 @@ def add_birthday(args, book):
     if len(args) < 2:
         return "Error: Give me name and birthday"
     
-    name = args[0]
-    birthday = args[1]
+    name, birthday = args
     
     record = book.find(name)
     
