@@ -1,28 +1,25 @@
-# робота з JSON файлом (читання/запис)
 import json
 from pathlib import Path
-import os
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
+DATA_DIR.mkdir(exist_ok=True, parents=True)
 
-if not os.path.exists(DATA_DIR):
-    os.makedirs(DATA_DIR)
-
-def save_to_json(data, filename): 
-
+def save_to_json(data, filename):
     if not isinstance(data, (dict, list)):
-        raise TypeError("Дані для JSON мають бути словником або списком.")
+        raise TypeError("Data persistence error: Data for JSON must be a dictionary or a list.")
 
     file_path = DATA_DIR / filename
-    # try:
-    with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4)
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4)
 
-    # except
+    except TypeError as e:
+        raise TypeError(f"Data serialization error in JSON: {e}")
+    except IOError as e:
+        raise IOError(f"Error writing to file {file_path}: {e}")
 
 
 def load_from_json(filename):
-
     file_path = DATA_DIR / filename  
 
     try:
@@ -30,10 +27,9 @@ def load_from_json(filename):
             content = f.read()
             if not content:
                 return {}
-            return json.loads(content)
-            
+            return json.loads(content)        
     except FileNotFoundError:
         return {}
     except json.JSONDecodeError:
-        print(f"Попередження: Файл {file_path} пошкоджено. Завантажено порожні дані.")
+        print(f"Warning: File {file_path} is corrupted. Loading empty data.")
         return {}
