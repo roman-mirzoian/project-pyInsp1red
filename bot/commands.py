@@ -1,6 +1,5 @@
 from bot.utils import parse_input
-from bot.models import Notes
-from bot.models import Record
+from bot.models import Notes, Record
 
 
 def add_contact(args, book):
