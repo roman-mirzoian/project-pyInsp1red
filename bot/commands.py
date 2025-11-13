@@ -46,8 +46,7 @@ def add_email(args, book):
     if len(args) < 2:
         return "Error: Give me name and email"
     
-    name = args[0]
-    email = args[1]
+    name, email = args
     
     record = book.find(name)
     
