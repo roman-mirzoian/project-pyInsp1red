@@ -6,8 +6,7 @@ def add_contact(args, book):
     if len(args) < 2:
         return "Error: Give me name and phone"
     
-    name = args[0]
-    phone = args[1]
+    name, phone = args
     
     try:
         record = book.find(name)
