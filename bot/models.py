@@ -47,9 +47,6 @@ class Birthday(Field):
 
 class Email(Field):
     def __init__(self, value):
-        # Regular expression for email validation
-        # Matches: email.test@example.com, asdsad2312@gmail.com,
-        # vasia.pupkin@domain.com.ua
         pattern = r'^[a-zA-Z0-9][a-zA-Z0-9._-]*@[a-zA-Z0-9]'
         pattern += r'[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(pattern, value):
@@ -73,7 +70,6 @@ class Record:
         self.address = None
 
     def add_phone(self, phone):
-        # Check if phone already exists
         for existing_phone in self.phones:
             if existing_phone.value == phone:
                 raise ValueError(ERROR_PHONE_EXISTS)

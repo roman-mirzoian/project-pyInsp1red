@@ -12,7 +12,7 @@ from bot.constants import (
     SUCCESS_BIRTHDAY_ADDED,
     SUCCESS_EMAIL_ADDED,
     SUCCESS_ADDRESS_ADDED,
-    INFO_NO_CONTACTS
+    INFO_NO_CONTACTS,
 )
 
 
@@ -73,7 +73,7 @@ def add_contact(args, book):
 @input_error
 def add_birthday(args, book):
     name, birthday = args[0], args[1]
-    
+
     record = book.find(name)
 
     if record is None:
@@ -85,7 +85,11 @@ def add_birthday(args, book):
 
 @input_error
 def add_email(args, book):
-    name, email = args[0], args[1]
+    if len(args) < 2:
+        return "Error: Give me name and email"
+
+    name = args[0]
+    email = args[1]
 
     record = book.find(name)
 
