@@ -6,6 +6,7 @@ from bot.constants import (
     ERROR_INVALID_EMAIL,
     ERROR_INVALID_DATE,
     ERROR_EMPTY_NAME,
+    ERROR_INVALID_NAME_LETTERS,
     ERROR_EMPTY_ADDRESS,
     ERROR_PHONE_EXISTS,
     DATE_FORMAT
@@ -23,6 +24,11 @@ class Name(Field):
     def __init__(self, value):
         if not value.strip():
             raise ValueError(ERROR_EMPTY_NAME)
+        
+        # Check that name is a single word containing only letters
+        if not re.match(r'^[a-zA-Z]+$', value.strip()):
+            raise ValueError(ERROR_INVALID_NAME_LETTERS)
+        
         super().__init__(value.strip())
 
 
@@ -148,10 +154,13 @@ class Record:
 
 class AddressBook(UserDict):
     def add_record(self, record: Record):
-        self.data[record.name.value] = record
+        key = record.name.value.capitalize()
+        self.data[key] = record
 
     def find(self, name):
-        return self.data.get(name)
+        # Search case-insensitively
+        key = name.capitalize()
+        return self.data.get(key)
     
     def to_dict(self):
         return {name: record.to_dict() for name, record in self.data.items()}
@@ -165,8 +174,12 @@ class AddressBook(UserDict):
         return obj
 
     def delete(self, name):
-        if name in self.data:
-            del self.data[name]
+        # Delete case-insensitively
+        key = name.capitalize()
+        if key in self.data:
+            del self.data[key]
+            return True
+        return False
 
 
 class Notes(UserDict):
