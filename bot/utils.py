@@ -10,25 +10,28 @@ def print_help():
     \033[1m=== Available Commands ===\033[0m
     
     \033[94m[Contact Management]\033[0m
-    - hello                          Display a greeting
-    - add <name> <phone>             Add a new contact
-    - add-email <name> <email>       Add email to contact
-    - add-address <name> <address>   Add address to contact
-    - all                            Show all contacts
-    
-    \033[92m[Birthday Management]\033[0m
-    - add-birthday <name> <birthday> Add birthday to contact
-    - show-birthday <name>           Show contact's birthday
-    - birthdays <days>               Show upcoming birthdays
+    - hello                              Display a greeting
+    - add <name>                         Add a new contact
+    - add <name> <phone>                 Add contact with phone
+    - add <name> <field> <value>         Add field to contact (phone, email, address, birthday)
+    - all                                Show all contacts
+    - show <name>                        Show contact details
+    - update <name> <field> <value>      Update contact field
+    - delete <name>                      Delete a contact
+    - remove <name> <field>              Remove field from contact
+    - find [field] <query>               Search contacts (case insensitive)
+                                         - find <query> (search all fields)
+                                         - find phone <query> (search phone only)
+                                         - find email <query> (search email only)
     
     \033[93m[Note Management]\033[0m
-    - add-note <title> <text>        Add a new note
-    - edit-note <id> <text>          Edit existing note
-    - find-notes <keyword>           Search notes by keyword
-    - all-notes                      Show all notes
-    - delete-note <id>               Delete a note
+    - add-note <title> <text>            Add a new note
+    - edit-note <id> <text>              Edit existing note
+    - find-notes <keyword>               Search notes by keyword
+    - all-notes                          Show all notes
+    - delete-note <id>                   Delete a note
     
     \033[91m[Exit]\033[0m
-    - close / exit                   Exit the application
+    - close / exit                       Exit the application
     """
     print(help_text)
