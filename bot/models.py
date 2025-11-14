@@ -1,5 +1,3 @@
-# всі структури даних (Field, Record і так далі)
-
 from datetime import datetime
 from collections import UserDict, defaultdict
 import re
@@ -12,7 +10,6 @@ from bot.constants import (
     ERROR_PHONE_EXISTS,
     DATE_FORMAT
 )
-
 
 class Field:
     def __init__(self, value):
@@ -98,14 +95,49 @@ class Record:
         if self.address:
             result += f", address: {self.address.value}"
         return result
+    
+    def to_dict(self):
+        return {
+            "name": self.name.value,
+            "phones": [p.value for p in self.phones],
+            "birthday": self.birthday.value.strftime(DATE_FORMAT) if self.birthday else None,
+            "email": self.email.value if self.email else None,
+            "address": self.address.value if self.address else None,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        record = cls(data["name"])
+
+        for phone in data.get("phones", []):
+            record.add_phone(phone)
+        if data.get("birthday"):
+            record.add_birthday(data["birthday"])
+        if data.get("email"):
+            record.add_email(data["email"])
+        if data.get("address"):
+            record.add_address(data["address"])
+
+        return record
 
 
 class AddressBook(UserDict):
-    def add_record(self, record):
+    def add_record(self, record: Record):
         self.data[record.name.value] = record
 
     def find(self, name):
         return self.data.get(name)
+    
+    def to_dict(self):
+        return {name: record.to_dict() for name, record in self.data.items()}
+    
+    @classmethod
+    def from_dict(cls, data: dict):
+        obj = cls()
+        from bot.models import Record
+        for name, record_data in data.items():
+            obj.data[name] = Record.from_dict(record_data)
+        return obj
 
 
 class Notes(UserDict):
@@ -142,3 +174,12 @@ class Notes(UserDict):
             return True
 
         return False
+    
+    def to_dict(self):
+        return dict(self.data)
+
+    @classmethod
+    def from_dict(cls, data):
+        obj = cls()
+        obj.data = data
+        return obj
