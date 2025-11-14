@@ -15,6 +15,7 @@ ERROR_INVALID_PHONE = "Sorry, invalid phone number, must be 10 digits"
 ERROR_INVALID_EMAIL = "Sorry, invalid email address"
 ERROR_INVALID_DATE = "Sorry, invalid date format, must be DD.MM.YYYY"
 ERROR_EMPTY_NAME = "Sorry, name cannot be empty"
+ERROR_INVALID_NAME_LETTERS = "Name must be a single word containing only letters"
 ERROR_EMPTY_ADDRESS = "Sorry, address cannot be empty"
 
 # Success messages

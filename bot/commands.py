@@ -152,28 +152,29 @@ def show_contact(args, book):
         return str(record)
 
     # If field specified, show only that field
+    stored_name = record.name.value
     field = args[1].lower()
 
     if field in ("phone", "phones"):
         if not record.phones:
-            return f"{name}: no phone numbers"
+            return f"{stored_name}: no phone numbers"
         phones = ", ".join(p.value for p in record.phones)
-        return f"{name} (phones): {phones}"
+        return f"{stored_name} (phones): {phones}"
 
     elif field == "birthday":
         if not record.birthday:
-            return f"{name}: no birthday"
-        return f"{name} (birthday): {record.birthday.value.strftime(DATE_FORMAT)}"
+            return f"{stored_name}: no birthday"
+        return f"{stored_name} (birthday): {record.birthday.value.strftime(DATE_FORMAT)}"
 
     elif field == "email":
         if not record.email:
-            return f"{name}: no email"
-        return f"{name} (email): {record.email.value}"
+            return f"{stored_name}: no email"
+        return f"{stored_name} (email): {record.email.value}"
 
     elif field == "address":
         if not record.address:
-            return f"{name}: no address"
-        return f"{name} (address): {record.address.value}"
+            return f"{stored_name}: no address"
+        return f"{stored_name} (address): {record.address.value}"
 
     else:
         return f"Unknown field: {field}. Available: phone, birthday, email, address"

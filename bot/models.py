@@ -6,6 +6,7 @@ from bot.constants import (
     ERROR_INVALID_EMAIL,
     ERROR_INVALID_DATE,
     ERROR_EMPTY_NAME,
+    ERROR_INVALID_NAME_LETTERS,
     ERROR_EMPTY_ADDRESS,
     ERROR_PHONE_EXISTS,
     DATE_FORMAT
@@ -23,6 +24,11 @@ class Name(Field):
     def __init__(self, value):
         if not value.strip():
             raise ValueError(ERROR_EMPTY_NAME)
+        
+        # Check that name is a single word containing only letters
+        if not re.match(r'^[a-zA-Z]+$', value.strip()):
+            raise ValueError(ERROR_INVALID_NAME_LETTERS)
+        
         super().__init__(value.strip())
 
 
