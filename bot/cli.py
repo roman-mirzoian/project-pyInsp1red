@@ -1,16 +1,20 @@
 from bot.commands import handle_command
+from bot.models import Notes
+from bot.utils import print_help
+from bot.completer import session
 from bot.constants import NOTES_DATA, USERS_DATA
 from bot.storage import load_from_json, save_to_json
 
 def run_bot():
+
     book = load_from_json('users.json', USERS_DATA)
     notes = load_from_json('notes.json', NOTES_DATA)
 
-    # TODO: add greeting text and main menu
-
+    print_help()
+    
     try:
         while True:
-            user_input = input("Enter a command: ").strip()
+            user_input = session.prompt(">>> ")
             if not user_input:
                 continue
 
