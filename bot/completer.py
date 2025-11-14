@@ -7,17 +7,19 @@ from prompt_toolkit.completion import WordCompleter
 # Define the completer with possible commands.
 completer = WordCompleter(
     [
-        "hello", 
-        "add", 
-        "add-birthday", 
-        "add-email", 
-        "add-address",
-        "all", 
-        "add-note", 
+        "hello",
+        "add",
+        "all",
+        "show",
+        "find",
+        "delete",
+        "update",
+        "remove",
+        "add-note",
         "edit-note",
         "find-notes",
         "all-notes",
-        "delete-note", 
+        "delete-note",
         "close",
         "exit"
     ],
