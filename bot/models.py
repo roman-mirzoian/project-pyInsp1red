@@ -174,7 +174,7 @@ class AddressBook(UserDict):
 
 
 class Notes(UserDict):
-    def add_note(self, user_name: str, note: str):
+    def add_note(self, user_name: str, note_text: str, tag: str = None):
         user_notes = self.data.setdefault(user_name, {})
         if user_notes:
             max_id = max(int(k) for k in user_notes.keys())
@@ -182,7 +182,7 @@ class Notes(UserDict):
         else:
             note_id = "1"
 
-        user_notes[note_id] = note
+        user_notes[note_id] = {"text": note_text, "tag": tag}
         return note_id
 
     def edit_note(self):
@@ -195,7 +195,8 @@ class Notes(UserDict):
         result = defaultdict(list)
 
         for user_name, notes in self.data.items():
-            for note_id, text in notes.items():
+            for note_id, note_data in notes.items():
+                text = note_data.get("text", "") 
                 if note_text in text:
                     result[user_name].append({"id": note_id, "text": text})
 
