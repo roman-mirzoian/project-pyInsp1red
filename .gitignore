@@ -18,4 +18,4 @@ ENV/
 .vscode/
 .idea/
 
-data/users.json
+/data/*.json
