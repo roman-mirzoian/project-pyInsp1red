@@ -1,5 +1,5 @@
 from bot.utils import parse_input
-from bot.models import Notes, Record
+from bot.models import Notes, Record, AddressBook
 from bot.constants import (
     ERROR_NO_COMMAND,
     ERROR_INSUFFICIENT_ARGS,
@@ -60,8 +60,54 @@ def input_error(func):
 
 @input_error
 def add_contact(args, book):
-    if len(args) < 1:
-        return ERROR_INSUFFICIENT_ARGS
+    name, phone, *_ = args
+    record = book.find(name)
+
+    if record is None:
+        record = Record(name)
+        book.add_record(record)
+        message = SUCCESS_CONTACT_ADDED
+    else:
+        message = SUCCESS_CONTACT_UPDATED
+
+    if phone:
+        record.add_phone(phone)
+
+    return message
+
+
+@input_error
+def add_birthday(args, book):
+    name, birthday = args[0], args[1]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    record.add_birthday(birthday)
+    return SUCCESS_BIRTHDAY_ADDED
+
+
+@input_error
+def get_upcoming_birthdays(args, book):
+    days_limit = int(input("How many days ahead should you search? "))
+    birthdays = book.get_upcoming_birthdays(days_limit)
+    if not birthdays:
+        return "There are no birthdays in the selected period."
+
+    lines = []
+    for b in birthdays:
+        lines.append(
+            f"{b['name']}, birthday {b['birthday']} – need to wish {b['congratulation_date']}"
+        )
+    return "\n".join(lines)
+
+
+@input_error
+def add_email(args, book):
+    if len(args) < 2:
+        return "Error: Give me name and email"
 
     name = args[0]
 
@@ -371,6 +417,10 @@ def handle_command(user_input: str, book, notes: Notes):
     commands = {
         "hello": lambda: "How can I help you?",
         "add": lambda: add_contact(args, book),
+        "add-birthday": lambda: add_birthday(args, book),
+        "birthdays": lambda: get_upcoming_birthdays(args, book),
+        "add-email": lambda: add_email(args, book),
+        "add-address": lambda: add_address(args, book),
         "all": lambda: show_all(book),
         "show": lambda: show_contact(args, book),
         "find": lambda: find_contacts(args, book),
