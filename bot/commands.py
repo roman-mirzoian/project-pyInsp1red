@@ -2,16 +2,19 @@ from bot.utils import parse_input
 from bot.models import Notes, Record
 from bot.constants import (
     ERROR_NO_COMMAND,
-    ERROR_GIVE_NAME_PHONE,
-    ERROR_GIVE_NAME_BIRTHDAY,
-    ERROR_GIVE_NAME_EMAIL,
-    ERROR_GIVE_NAME_ADDRESS,
+    ERROR_INSUFFICIENT_ARGS,
     ERROR_CONTACT_NOT_FOUND,
+    ERROR_PHONE_NOT_FOUND,
     SUCCESS_CONTACT_ADDED,
     SUCCESS_CONTACT_UPDATED,
+    SUCCESS_CONTACT_DELETED,
     SUCCESS_BIRTHDAY_ADDED,
+    SUCCESS_BIRTHDAY_UPDATED,
     SUCCESS_EMAIL_ADDED,
+    SUCCESS_EMAIL_UPDATED,
     SUCCESS_ADDRESS_ADDED,
+    SUCCESS_ADDRESS_UPDATED,
+    SUCCESS_PHONE_UPDATED,
     INFO_NO_CONTACTS,
 )
 
@@ -24,20 +27,14 @@ def input_error(func):
             return ERROR_NO_COMMAND
 
         # Check for specific command errors
-        if func.__name__ == "add_contact":
-            if len(args) == 0:
-                return ERROR_GIVE_NAME_PHONE
-            elif len(args) == 1:
-                return ERROR_GIVE_NAME_PHONE
-        elif func.__name__ == "add_birthday":
+        if func.__name__ in ("add_contact", "add_birthday", "add_email",
+                             "add_address", "update_phone", "update_birthday",
+                             "update_email", "update_address"):
             if len(args) < 2:
-                return ERROR_GIVE_NAME_BIRTHDAY
-        elif func.__name__ == "add_email":
-            if len(args) < 2:
-                return ERROR_GIVE_NAME_EMAIL
-        elif func.__name__ == "add_address":
-            if len(args) < 2:
-                return ERROR_GIVE_NAME_ADDRESS
+                return ERROR_INSUFFICIENT_ARGS
+        elif func.__name__ == "delete_contact":
+            if len(args) < 1:
+                return ERROR_INSUFFICIENT_ARGS
 
         # Handle exceptions from the command functions
         try:
@@ -125,6 +122,77 @@ def show_all(book):
     return "\n".join(result)
 
 
+@input_error
+def delete_contact(args, book):
+    name = args[0]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    book.delete(name)
+    return SUCCESS_CONTACT_DELETED
+
+
+@input_error
+def update_phone(args, book):
+    name, new_phone = args[0], args[1]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    if not record.phones:
+        return ERROR_PHONE_NOT_FOUND
+
+    # Update the first phone number
+    record.phones[0] = record.phones[0].__class__(new_phone)
+
+    return SUCCESS_PHONE_UPDATED
+
+
+@input_error
+def update_birthday(args, book):
+    name, new_birthday = args[0], args[1]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    record.add_birthday(new_birthday)
+    return SUCCESS_BIRTHDAY_UPDATED
+
+
+@input_error
+def update_email(args, book):
+    name, new_email = args[0], args[1]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    record.add_email(new_email)
+    return SUCCESS_EMAIL_UPDATED
+
+
+@input_error
+def update_address(args, book):
+    name = args[0]
+    new_address = " ".join(args[1:])
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    record.add_address(new_address)
+    return SUCCESS_ADDRESS_UPDATED
+
+
 def handle_command(user_input: str, book, notes: Notes):
     command, *args = parse_input(user_input)
 
@@ -135,6 +203,11 @@ def handle_command(user_input: str, book, notes: Notes):
         "add-email": lambda: add_email(args, book),
         "add-address": lambda: add_address(args, book),
         "all": lambda: show_all(book),
+        "delete": lambda: delete_contact(args, book),
+        "update-phone": lambda: update_phone(args, book),
+        "update-birthday": lambda: update_birthday(args, book),
+        "update-email": lambda: update_email(args, book),
+        "update-address": lambda: update_address(args, book),
         "add-note": lambda: add_note(args, notes),
         "edit-note": lambda: edit_note(args, notes),
         "find-notes": lambda: find_notes(args, notes),

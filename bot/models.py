@@ -107,6 +107,10 @@ class AddressBook(UserDict):
     def find(self, name):
         return self.data.get(name)
 
+    def delete(self, name):
+        if name in self.data:
+            del self.data[name]
+
 
 class Notes(UserDict):
     def add_note(self, user_name: str, note: str):
