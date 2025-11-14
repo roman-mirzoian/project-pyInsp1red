@@ -127,6 +127,20 @@ def add_contact(args, book):
     return ERROR_INSUFFICIENT_ARGS
 
 
+@input_error
+def get_upcoming_birthdays(args, book):
+    days_limit = int(input("How many days ahead should you search? "))
+    birthdays = book.get_upcoming_birthdays(days_limit)
+    if not birthdays:
+        return "There are no birthdays in the selected period."
+    birthdays_message = []
+    for b in birthdays:
+        birthdays_message.append(
+            f"{b['name']}, birthday {b['birthday']} – need to wish {b['congratulation_date']}"
+        )
+    return "\n".join(birthdays_message)
+
+
 def show_all(book):
     if not book.data:
         return INFO_NO_CONTACTS
@@ -372,6 +386,7 @@ def handle_command(user_input: str, book, notes: Notes):
         "hello": lambda: "How can I help you?",
         "add": lambda: add_contact(args, book),
         "all": lambda: show_all(book),
+        "birthdays": lambda: get_upcoming_birthdays(args, book),
         "show": lambda: show_contact(args, book),
         "find": lambda: find_contacts(args, book),
         "delete": lambda: delete_contact(args, book),

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from collections import UserDict, defaultdict
 import re
 from bot.constants import (
@@ -180,6 +180,45 @@ class AddressBook(UserDict):
             del self.data[key]
             return True
         return False
+
+    def get_upcoming_birthdays(self, days_limit: int = 7):
+        today = date.today()
+        upcoming_birthdays = []
+
+        for record in self.data.values():
+            if not record.birthday:
+                continue
+
+            birthday_date = record.birthday.value.date()
+            if birthday_date.month == 2 and birthday_date.day == 29:
+                try:
+                    birthday_this_year = birthday_date.replace(year=today.year)
+                except ValueError:
+                    birthday_this_year = date(today.year, 2, 28)
+            else:
+                birthday_this_year = birthday_date.replace(year=today.year)
+
+            if birthday_this_year < today:
+                birthday_this_year = birthday_this_year.replace(year=today.year + 1)
+
+            days_until_birthday = (birthday_this_year - today).days
+
+            if not (0 <= days_until_birthday <= days_limit):
+                continue
+
+            congratulation_date = birthday_this_year
+            if congratulation_date.weekday() == 5:
+                congratulation_date += timedelta(days=2)
+            elif congratulation_date.weekday() == 6:
+                congratulation_date += timedelta(days=1)
+
+            upcoming_birthdays.append({
+                "name": record.name.value,
+                "birthday": birthday_date.strftime(DATE_FORMAT),
+                "congratulation_date": congratulation_date.strftime(DATE_FORMAT),
+            })
+
+        return upcoming_birthdays
 
 
 class Notes(UserDict):
