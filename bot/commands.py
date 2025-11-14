@@ -36,7 +36,6 @@ def input_error(func):
             return ERROR_NO_COMMAND
 
         # Check for specific command errors
-        # Note: add_contact and remove_field handle their own validation internally
         if func.__name__ in ("add_birthday", "add_email",
                              "add_address", "update_phone", "update_birthday",
                              "update_email", "update_address", "remove_phone"):
@@ -181,6 +180,85 @@ def show_contact(args, book):
 
 
 @input_error
+def find_contacts(args, book):
+    if len(args) < 1:
+        return ERROR_INSUFFICIENT_ARGS
+
+    search_string = args[0].lower()
+
+    # Case 1: find search_string - search all fields
+    if len(args) == 1:
+        results = []
+        for record in book.data.values():
+            # Search in name
+            if search_string in record.name.value.lower():
+                results.append(record)
+                continue
+
+            # Search in phones
+            if any(search_string in phone.value for phone in record.phones):
+                results.append(record)
+                continue
+
+            # Search in birthday
+            if record.birthday and search_string in record.birthday.value.strftime(DATE_FORMAT):
+                results.append(record)
+                continue
+
+            # Search in email
+            if record.email and search_string in record.email.value.lower():
+                results.append(record)
+                continue
+
+            # Search in address
+            if record.address and search_string in record.address.value.lower():
+                results.append(record)
+                continue
+
+        if not results:
+            return f"No contacts found matching '{args[0]}'"
+
+        return "\n".join(str(record) for record in results)
+
+    # Case 2: find search_string field - search specific field
+    field = args[1].lower()
+    results = []
+
+    if field in ("phone", "phones"):
+        for record in book.data.values():
+            if any(search_string in phone.value for phone in record.phones):
+                results.append(record)
+
+    elif field == "birthday":
+        for record in book.data.values():
+            if record.birthday and search_string in record.birthday.value.strftime(DATE_FORMAT):
+                results.append(record)
+
+    elif field == "email":
+        for record in book.data.values():
+            if record.email and search_string in record.email.value.lower():
+                results.append(record)
+
+    elif field == "address":
+        for record in book.data.values():
+            if record.address and search_string in record.address.value.lower():
+                results.append(record)
+
+    elif field == "name":
+        for record in book.data.values():
+            if search_string in record.name.value.lower():
+                results.append(record)
+
+    else:
+        return f"Unknown field: {field}. Available: name, phone, birthday, email, address"
+
+    if not results:
+        return f"No contacts found with '{args[0]}' in {field}"
+
+    return "\n".join(str(record) for record in results)
+
+
+@input_error
 def delete_contact(args, book):
     name = args[0]
 
@@ -294,6 +372,7 @@ def handle_command(user_input: str, book, notes: Notes):
         "add": lambda: add_contact(args, book),
         "all": lambda: show_all(book),
         "show": lambda: show_contact(args, book),
+        "find": lambda: find_contacts(args, book),
         "delete": lambda: delete_contact(args, book),
         "update": lambda: update_contact(args, book),
         "remove": lambda: remove_field(args, book),
