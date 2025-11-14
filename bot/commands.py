@@ -1,5 +1,5 @@
 from bot.utils import parse_input
-from bot.models import Notes, Record
+from bot.models import Notes, Record, AddressBook
 from bot.constants import (
     ERROR_NO_COMMAND,
     ERROR_GIVE_NAME_PHONE,
@@ -84,6 +84,21 @@ def add_birthday(args, book):
 
 
 @input_error
+def get_upcoming_birthdays(args, book):
+    days_limit = int(input("How many days ahead should you search? "))
+    birthdays = book.get_upcoming_birthdays(days_limit)
+    if not birthdays:
+        return "There are no birthdays in the selected period."
+
+    lines = []
+    for b in birthdays:
+        lines.append(
+            f"{b['name']}, birthday {b['birthday']} – need to wish {b['congratulation_date']}"
+        )
+    return "\n".join(lines)
+
+
+@input_error
 def add_email(args, book):
     if len(args) < 2:
         return "Error: Give me name and email"
@@ -132,6 +147,7 @@ def handle_command(user_input: str, book, notes: Notes):
         "hello": lambda: "How can I help you?",
         "add": lambda: add_contact(args, book),
         "add-birthday": lambda: add_birthday(args, book),
+        "birthdays": lambda: get_upcoming_birthdays(args, book),
         "add-email": lambda: add_email(args, book),
         "add-address": lambda: add_address(args, book),
         "all": lambda: show_all(book),
