@@ -76,14 +76,39 @@ class Record:
 
         self.phones.append(Phone(phone))
 
+    def remove_phone(self, phone):
+        for existing_phone in self.phones:
+            if existing_phone.value == phone:
+                self.phones.remove(existing_phone)
+                return True
+        return False
+
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
+
+    def remove_birthday(self):
+        if self.birthday:
+            self.birthday = None
+            return True
+        return False
 
     def add_email(self, email):
         self.email = Email(email)
 
+    def remove_email(self):
+        if self.email:
+            self.email = None
+            return True
+        return False
+
     def add_address(self, address):
         self.address = Address(address)
+
+    def remove_address(self):
+        if self.address:
+            self.address = None
+            return True
+        return False
 
     def __str__(self):
         result = f"Contact name: {self.name.value}"

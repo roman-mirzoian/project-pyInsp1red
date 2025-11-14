@@ -5,17 +5,25 @@ from bot.constants import (
     ERROR_INSUFFICIENT_ARGS,
     ERROR_CONTACT_NOT_FOUND,
     ERROR_PHONE_NOT_FOUND,
+    ERROR_BIRTHDAY_NOT_FOUND,
+    ERROR_EMAIL_NOT_FOUND,
+    ERROR_ADDRESS_NOT_FOUND,
     SUCCESS_CONTACT_ADDED,
     SUCCESS_CONTACT_UPDATED,
     SUCCESS_CONTACT_DELETED,
     SUCCESS_BIRTHDAY_ADDED,
     SUCCESS_BIRTHDAY_UPDATED,
+    SUCCESS_BIRTHDAY_REMOVED,
     SUCCESS_EMAIL_ADDED,
     SUCCESS_EMAIL_UPDATED,
+    SUCCESS_EMAIL_REMOVED,
     SUCCESS_ADDRESS_ADDED,
     SUCCESS_ADDRESS_UPDATED,
+    SUCCESS_ADDRESS_REMOVED,
     SUCCESS_PHONE_UPDATED,
+    SUCCESS_PHONE_REMOVED,
     INFO_NO_CONTACTS,
+    DATE_FORMAT,
 )
 
 
@@ -29,10 +37,12 @@ def input_error(func):
         # Check for specific command errors
         if func.__name__ in ("add_contact", "add_birthday", "add_email",
                              "add_address", "update_phone", "update_birthday",
-                             "update_email", "update_address"):
+                             "update_email", "update_address", "remove_phone"):
             if len(args) < 2:
                 return ERROR_INSUFFICIENT_ARGS
-        elif func.__name__ == "delete_contact":
+        elif func.__name__ in ("delete_contact", "show_contact",
+                               "remove_birthday", "remove_email",
+                               "remove_address"):
             if len(args) < 1:
                 return ERROR_INSUFFICIENT_ARGS
 
@@ -123,6 +133,47 @@ def show_all(book):
 
 
 @input_error
+def show_contact(args, book):
+    name = args[0]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    # If only name provided, show all information
+    if len(args) == 1:
+        return str(record)
+
+    # If field specified, show only that field
+    field = args[1].lower()
+
+    if field in ("phone", "phones"):
+        if not record.phones:
+            return f"{name}: no phone numbers"
+        phones = ", ".join(p.value for p in record.phones)
+        return f"{name} (phones): {phones}"
+
+    elif field == "birthday":
+        if not record.birthday:
+            return f"{name}: no birthday"
+        return f"{name} (birthday): {record.birthday.value.strftime(DATE_FORMAT)}"
+
+    elif field == "email":
+        if not record.email:
+            return f"{name}: no email"
+        return f"{name} (email): {record.email.value}"
+
+    elif field == "address":
+        if not record.address:
+            return f"{name}: no address"
+        return f"{name} (address): {record.address.value}"
+
+    else:
+        return f"Unknown field: {field}. Available: phone, birthday, email, address"
+
+
+@input_error
 def delete_contact(args, book):
     name = args[0]
 
@@ -193,6 +244,66 @@ def update_address(args, book):
     return SUCCESS_ADDRESS_UPDATED
 
 
+@input_error
+def remove_phone(args, book):
+    name, phone = args[0], args[1]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    if record.remove_phone(phone):
+        return SUCCESS_PHONE_REMOVED
+    else:
+        return ERROR_PHONE_NOT_FOUND
+
+
+@input_error
+def remove_birthday(args, book):
+    name = args[0]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    if record.remove_birthday():
+        return SUCCESS_BIRTHDAY_REMOVED
+    else:
+        return ERROR_BIRTHDAY_NOT_FOUND
+
+
+@input_error
+def remove_email(args, book):
+    name = args[0]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    if record.remove_email():
+        return SUCCESS_EMAIL_REMOVED
+    else:
+        return ERROR_EMAIL_NOT_FOUND
+
+
+@input_error
+def remove_address(args, book):
+    name = args[0]
+
+    record = book.find(name)
+
+    if record is None:
+        return ERROR_CONTACT_NOT_FOUND
+
+    if record.remove_address():
+        return SUCCESS_ADDRESS_REMOVED
+    else:
+        return ERROR_ADDRESS_NOT_FOUND
+
+
 def handle_command(user_input: str, book, notes: Notes):
     command, *args = parse_input(user_input)
 
@@ -203,11 +314,16 @@ def handle_command(user_input: str, book, notes: Notes):
         "add-email": lambda: add_email(args, book),
         "add-address": lambda: add_address(args, book),
         "all": lambda: show_all(book),
+        "show": lambda: show_contact(args, book),
         "delete": lambda: delete_contact(args, book),
         "update-phone": lambda: update_phone(args, book),
         "update-birthday": lambda: update_birthday(args, book),
         "update-email": lambda: update_email(args, book),
         "update-address": lambda: update_address(args, book),
+        "remove-phone": lambda: remove_phone(args, book),
+        "remove-birthday": lambda: remove_birthday(args, book),
+        "remove-email": lambda: remove_email(args, book),
+        "remove-address": lambda: remove_address(args, book),
         "add-note": lambda: add_note(args, notes),
         "edit-note": lambda: edit_note(args, notes),
         "find-notes": lambda: find_notes(args, notes),
