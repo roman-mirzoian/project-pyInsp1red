@@ -11,6 +11,9 @@ from bot.constants import (
     SUCCESS_CONTACT_ADDED,
     SUCCESS_CONTACT_UPDATED,
     SUCCESS_CONTACT_DELETED,
+    SUCCESS_PHONE_ADDED,
+    SUCCESS_PHONE_UPDATED,
+    SUCCESS_PHONE_REMOVED,
     SUCCESS_BIRTHDAY_ADDED,
     SUCCESS_BIRTHDAY_UPDATED,
     SUCCESS_BIRTHDAY_REMOVED,
@@ -20,8 +23,6 @@ from bot.constants import (
     SUCCESS_ADDRESS_ADDED,
     SUCCESS_ADDRESS_UPDATED,
     SUCCESS_ADDRESS_REMOVED,
-    SUCCESS_PHONE_UPDATED,
-    SUCCESS_PHONE_REMOVED,
     INFO_NO_CONTACTS,
     DATE_FORMAT,
 )
@@ -35,14 +36,13 @@ def input_error(func):
             return ERROR_NO_COMMAND
 
         # Check for specific command errors
-        if func.__name__ in ("add_contact", "add_birthday", "add_email",
+        # Note: add_contact and remove_field handle their own validation internally
+        if func.__name__ in ("add_birthday", "add_email",
                              "add_address", "update_phone", "update_birthday",
                              "update_email", "update_address", "remove_phone"):
             if len(args) < 2:
                 return ERROR_INSUFFICIENT_ARGS
-        elif func.__name__ in ("delete_contact", "show_contact",
-                               "remove_birthday", "remove_email",
-                               "remove_address"):
+        elif func.__name__ in ("delete_contact", "show_contact"):
             if len(args) < 1:
                 return ERROR_INSUFFICIENT_ARGS
 
@@ -61,64 +61,71 @@ def input_error(func):
 
 @input_error
 def add_contact(args, book):
-    name, phone, *_ = args
-    record = book.find(name)
-
-    if record is None:
-        record = Record(name)
-        book.add_record(record)
-        message = SUCCESS_CONTACT_ADDED
-    else:
-        message = SUCCESS_CONTACT_UPDATED
-
-    if phone:
-        record.add_phone(phone)
-
-    return message
-
-
-@input_error
-def add_birthday(args, book):
-    name, birthday = args[0], args[1]
-
-    record = book.find(name)
-
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
-
-    record.add_birthday(birthday)
-    return SUCCESS_BIRTHDAY_ADDED
-
-
-@input_error
-def add_email(args, book):
-    if len(args) < 2:
-        return "Error: Give me name and email"
+    if len(args) < 1:
+        return ERROR_INSUFFICIENT_ARGS
 
     name = args[0]
-    email = args[1]
 
-    record = book.find(name)
+    # Case 1: add John - just create contact
+    if len(args) == 1:
+        record = book.find(name)
+        if record is None:
+            # Capitalize name for consistency
+            record = Record(name.capitalize())
+            book.add_record(record)
+            return SUCCESS_CONTACT_ADDED
+        else:
+            return "Contact already exists"
 
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
+    # Case 2: add John 1231231231 - create contact + add phone
+    # Check if second arg is a phone number (10 digits)
+    if len(args) == 2 and args[1].isdigit() and len(args[1]) == 10:
+        record = book.find(name)
+        if record is None:
+            # Capitalize name for consistency
+            record = Record(name.capitalize())
+            book.add_record(record)
+            message = SUCCESS_CONTACT_ADDED
+        else:
+            message = SUCCESS_CONTACT_UPDATED
 
-    record.add_email(email)
-    return SUCCESS_EMAIL_ADDED
+        record.add_phone(args[1])
+        return message
 
+    # Case 3: add John phone 1231231231 - add field to existing contact
+    if len(args) >= 3:
+        field = args[1].lower()
 
-@input_error
-def add_address(args, book):
-    name = args[0]
-    address = " ".join(args[1:])
+        record = book.find(name)
+        if record is None:
+            # Auto-create contact if it doesn't exist (capitalize name)
+            record = Record(name.capitalize())
+            book.add_record(record)
 
-    record = book.find(name)
+        if field in ("phone", "phones"):
+            phone = args[2]
+            record.add_phone(phone)
+            return SUCCESS_PHONE_ADDED if hasattr(record, 'phones') and len(record.phones) > 0 else SUCCESS_CONTACT_UPDATED
 
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
+        elif field == "birthday":
+            birthday = args[2]
+            record.add_birthday(birthday)
+            return SUCCESS_BIRTHDAY_ADDED
 
-    record.add_address(address)
-    return SUCCESS_ADDRESS_ADDED
+        elif field == "email":
+            email = args[2]
+            record.add_email(email)
+            return SUCCESS_EMAIL_ADDED
+
+        elif field == "address":
+            address = " ".join(args[2:])
+            record.add_address(address)
+            return SUCCESS_ADDRESS_ADDED
+
+        else:
+            return f"Unknown field: {field}. Available: phone, birthday, email, address"
+
+    return ERROR_INSUFFICIENT_ARGS
 
 
 def show_all(book):
@@ -187,121 +194,96 @@ def delete_contact(args, book):
 
 
 @input_error
-def update_phone(args, book):
-    name, new_phone = args[0], args[1]
+def update_contact(args, book):
+    if len(args) < 3:
+        return ERROR_INSUFFICIENT_ARGS
 
-    record = book.find(name)
-
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
-
-    if not record.phones:
-        return ERROR_PHONE_NOT_FOUND
-
-    # Update the first phone number
-    record.phones[0] = record.phones[0].__class__(new_phone)
-
-    return SUCCESS_PHONE_UPDATED
-
-
-@input_error
-def update_birthday(args, book):
-    name, new_birthday = args[0], args[1]
-
-    record = book.find(name)
-
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
-
-    record.add_birthday(new_birthday)
-    return SUCCESS_BIRTHDAY_UPDATED
-
-
-@input_error
-def update_email(args, book):
-    name, new_email = args[0], args[1]
-
-    record = book.find(name)
-
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
-
-    record.add_email(new_email)
-    return SUCCESS_EMAIL_UPDATED
-
-
-@input_error
-def update_address(args, book):
     name = args[0]
-    new_address = " ".join(args[1:])
+    field = args[1].lower()
 
     record = book.find(name)
 
     if record is None:
         return ERROR_CONTACT_NOT_FOUND
 
-    record.add_address(new_address)
-    return SUCCESS_ADDRESS_UPDATED
+    if field in ("phone", "phones"):
+        new_phone = args[2]
+        if not record.phones:
+            return ERROR_PHONE_NOT_FOUND
+        # Update the first phone number
+        record.phones[0] = record.phones[0].__class__(new_phone)
+        return SUCCESS_PHONE_UPDATED
 
+    elif field == "birthday":
+        new_birthday = args[2]
+        record.add_birthday(new_birthday)
+        return SUCCESS_BIRTHDAY_UPDATED
 
-@input_error
-def remove_phone(args, book):
-    name, phone = args[0], args[1]
+    elif field == "email":
+        new_email = args[2]
+        record.add_email(new_email)
+        return SUCCESS_EMAIL_UPDATED
 
-    record = book.find(name)
+    elif field == "address":
+        new_address = " ".join(args[2:])
+        record.add_address(new_address)
+        return SUCCESS_ADDRESS_UPDATED
 
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
-
-    if record.remove_phone(phone):
-        return SUCCESS_PHONE_REMOVED
     else:
-        return ERROR_PHONE_NOT_FOUND
+        return f"Unknown field: {field}. Available: phone, birthday, email, address"
 
 
 @input_error
-def remove_birthday(args, book):
+def remove_field(args, book):
+    if len(args) < 1:
+        return ERROR_INSUFFICIENT_ARGS
+
     name = args[0]
 
-    record = book.find(name)
+    # Case 1: remove John - delete entire contact
+    if len(args) == 1:
+        if book.delete(name):
+            return SUCCESS_CONTACT_DELETED
+        else:
+            return ERROR_CONTACT_NOT_FOUND
 
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
-
-    if record.remove_birthday():
-        return SUCCESS_BIRTHDAY_REMOVED
-    else:
-        return ERROR_BIRTHDAY_NOT_FOUND
-
-
-@input_error
-def remove_email(args, book):
-    name = args[0]
+    # Case 2: remove John field [value] - remove specific field
+    field = args[1].lower()
 
     record = book.find(name)
 
     if record is None:
         return ERROR_CONTACT_NOT_FOUND
 
-    if record.remove_email():
-        return SUCCESS_EMAIL_REMOVED
+    if field in ("phone", "phones"):
+        if len(args) < 3:
+            return ERROR_INSUFFICIENT_ARGS
+        phone = args[2]
+        if record.remove_phone(phone):
+            return SUCCESS_PHONE_REMOVED
+        else:
+            return ERROR_PHONE_NOT_FOUND
+
+    elif field == "birthday":
+        if record.remove_birthday():
+            return SUCCESS_BIRTHDAY_REMOVED
+        else:
+            return ERROR_BIRTHDAY_NOT_FOUND
+
+    elif field == "email":
+        if record.remove_email():
+            return SUCCESS_EMAIL_REMOVED
+        else:
+            return ERROR_EMAIL_NOT_FOUND
+
+    elif field == "address":
+        if record.remove_address():
+            return SUCCESS_ADDRESS_REMOVED
+        else:
+            return ERROR_ADDRESS_NOT_FOUND
+
     else:
-        return ERROR_EMAIL_NOT_FOUND
-
-
-@input_error
-def remove_address(args, book):
-    name = args[0]
-
-    record = book.find(name)
-
-    if record is None:
-        return ERROR_CONTACT_NOT_FOUND
-
-    if record.remove_address():
-        return SUCCESS_ADDRESS_REMOVED
-    else:
-        return ERROR_ADDRESS_NOT_FOUND
+        return f"Unknown field: {field}. Available: phone, birthday, email, address"
 
 
 def handle_command(user_input: str, book, notes: Notes):
@@ -310,20 +292,11 @@ def handle_command(user_input: str, book, notes: Notes):
     commands = {
         "hello": lambda: "How can I help you?",
         "add": lambda: add_contact(args, book),
-        "add-birthday": lambda: add_birthday(args, book),
-        "add-email": lambda: add_email(args, book),
-        "add-address": lambda: add_address(args, book),
         "all": lambda: show_all(book),
         "show": lambda: show_contact(args, book),
         "delete": lambda: delete_contact(args, book),
-        "update-phone": lambda: update_phone(args, book),
-        "update-birthday": lambda: update_birthday(args, book),
-        "update-email": lambda: update_email(args, book),
-        "update-address": lambda: update_address(args, book),
-        "remove-phone": lambda: remove_phone(args, book),
-        "remove-birthday": lambda: remove_birthday(args, book),
-        "remove-email": lambda: remove_email(args, book),
-        "remove-address": lambda: remove_address(args, book),
+        "update": lambda: update_contact(args, book),
+        "remove": lambda: remove_field(args, book),
         "add-note": lambda: add_note(args, notes),
         "edit-note": lambda: edit_note(args, notes),
         "find-notes": lambda: find_notes(args, notes),
