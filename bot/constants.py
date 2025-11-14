@@ -1,3 +1,7 @@
+# Data types
+USERS_DATA = 'user_data'
+NOTES_DATA = 'notes_data'
+
 # Error messages Constants
 ERROR_NO_COMMAND = "Please enter a command."
 ERROR_GIVE_NAME_PHONE = "Error: Please provide name and phone"
