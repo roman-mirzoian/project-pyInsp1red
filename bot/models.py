@@ -233,8 +233,11 @@ class Notes(UserDict):
         user_notes[note_id] = {"text": note_text, "tag": tag}
         return note_id
 
-    def edit_note(self):
-        pass
+    def edit_note(self, user_name: str, note_id: str, new_text: str):
+        if user_name in self.data and note_id in self.data[user_name]:
+            self.data[user_name][note_id]["text"] = new_text
+            return note_id
+        return False
 
     def get_all_user_notes(self, user_name: str) -> dict:
         return self.data.get(user_name, {})
@@ -260,6 +263,23 @@ class Notes(UserDict):
             return True
 
         return False
+    
+    def group_notes_by_tag(self) -> dict:
+        notes_by_tag = defaultdict(list)
+
+        for user_name, notes in self.data.items():
+            for note_id, note_data in notes.items():
+                tag = note_data.get("tag")
+                if tag is None or tag == "":
+                    tag = "No tag"
+                
+                notes_by_tag[tag].append({
+                    "user": user_name,
+                    "id": note_id,
+                    "text": note_data.get("text", "")
+                })
+
+        return dict(notes_by_tag)
     
     def to_dict(self):
         return dict(self.data)

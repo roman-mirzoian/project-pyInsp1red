@@ -10,6 +10,7 @@ completer = WordCompleter(
         "hello",
         "add",
         "all",
+        "birthdays",
         "show",
         "find",
         "delete",
@@ -22,6 +23,8 @@ completer = WordCompleter(
         "all-notes",
         "delete-note",
         "help",
+        "find-tag",
+        "sort-notes",
         "close",
         "exit"
     ],
