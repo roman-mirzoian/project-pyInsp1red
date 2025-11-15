@@ -25,11 +25,11 @@ def print_help():
                                          - find email <query> (search email only)
     
     \033[93m[Note Management]\033[0m
-    - add-note <title> <text>            Add a new note
-    - edit-note <id> <text>              Edit existing note
+    - add-note <user_name <text>         Add a new note
+    - edit-note <user_name> <id> <text>  Edit existing note
     - find-notes <keyword>               Search notes by keyword
     - all-notes                          Show all notes
-    - delete-note <id>                   Delete a note
+    - delete-note <user_name> <id>       Delete a note
     
     \033[91m[Exit]\033[0m
     - close / exit                       Exit the application

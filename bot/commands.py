@@ -435,7 +435,14 @@ def add_note(args, notes: Notes) -> str:
 
 
 def edit_note(args, notes: Notes):
-    pass
+    user_name = args[0]
+    note_id = args[1]
+    new_text = " ".join(args[2:])
+
+    note_id = notes.edit_note(user_name, note_id, new_text)
+    if not note_id:
+        return "The note was not edited, check the username and note ID."
+    return f"The note #{note_id} for '{user_name}' has been updated."
 
 
 def find_notes(args, notes: Notes) -> str:

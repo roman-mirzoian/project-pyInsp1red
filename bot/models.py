@@ -233,8 +233,11 @@ class Notes(UserDict):
         user_notes[note_id] = {"text": note_text, "tag": tag}
         return note_id
 
-    def edit_note(self):
-        pass
+    def edit_note(self, user_name: str, note_id: str, new_text: str):
+        if user_name in self.data and note_id in self.data[user_name]:
+            self.data[user_name][note_id]["text"] = new_text
+            return note_id
+        return False
 
     def get_all_user_notes(self, user_name: str) -> dict:
         return self.data.get(user_name, {})
