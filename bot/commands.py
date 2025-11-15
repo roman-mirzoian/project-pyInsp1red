@@ -1,3 +1,4 @@
+import prompt_toolkit
 from bot.utils import parse_input
 from bot.models import Notes, Record
 from bot.constants import (
@@ -437,7 +438,7 @@ def add_note(args, notes: Notes) -> str:
 def edit_note(args, notes: Notes):
     user_name = args[0]
     note_id = args[1]
-    new_text = " ".join(args[2:])
+    new_text = prompt_toolkit.prompt("Enter the new note text: ", default=notes.get_all_user_notes(user_name).get(note_id, {}).get("text", ""))
 
     note_id = notes.edit_note(user_name, note_id, new_text)
     if not note_id:

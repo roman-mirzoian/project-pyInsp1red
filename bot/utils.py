@@ -28,7 +28,7 @@ def print_help():
     - add-note <user_name <text>         Add a new note
     - edit-note <user_name> <id> <text>  Edit existing note
     - find-notes <keyword>               Search notes by keyword
-    - all-notes                          Show all notes
+    - all-notes <user_name>              Show all notes
     - delete-note <user_name> <id>       Delete a note
     
     \033[91m[Exit]\033[0m
