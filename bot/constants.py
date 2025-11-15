@@ -40,3 +40,169 @@ INFO_NO_CONTACTS = "No contacts"
 
 # Date format
 DATE_FORMAT = "%d.%m.%Y"
+
+# Help messages
+MAIN_HELP_TEXT = """
+\033[1m=== Available Commands ===\033[0m
+
+- help <command>                     Show help for a specific command
+                                        If there are no <command>, show all available commands                    
+
+\033[94m[Contact Management]\033[0m
+- hello                              Display a greeting
+- add <name>                         Add a new contact
+- add <name> <phone>                 Add contact with phone
+- add <name> <field> <value>         Add field to contact (phone, email, address, birthday)
+- all                                Show all contacts
+- birthdays                          Show upcoming birthdays
+- show <name>                        Show contact details
+- update <name> <field> <value>      Update contact field
+- delete <name>                      Delete a contact
+- remove <name> <field>              Remove field from contact
+- find [field] <query>               Search contacts (case insensitive)
+                                        - find <query> (search all fields)
+                                        - find phone <query> (search phone only)
+                                        - find email <query> (search email only)
+- birthdays <days>                   Show upcoming birthdays within <days>
+
+\033[93m[Note Management]\033[0m
+- add-note <user_name> <text>        Add a new note for a user
+- edit-note <user_name> <id>         Edit existing note
+- find-notes <keyword>               Search notes by keyword
+- find-tag <tag>                     Find notes by tag
+- sort-notes                         Show notes sorted/grouped by tag
+- all-notes <user_name>              Show all notes for a user
+- delete-note <user_name> <id>       Delete a note
+
+\033[91m[Exit]\033[0m
+- close / exit                       Exit the application
+"""
+
+HELP_MESSAGES = {
+"add": """
+Command: add
+Usage:
+  add <name>
+  add <name> <phone>
+  add <name> <field> <value>
+
+Description:
+  Adds a new contact or adds a new field to an existing contact.
+
+Examples:
+  add John
+  add John 0987654321
+  add John email john@gmail.com
+""",
+    
+    "all": """
+Command: all
+Usage:
+  all
+
+Description:
+  Shows a list of all contacts stored in your address book.
+""",
+    
+    "show": """
+Command: show
+Usage:
+  show <name>
+
+Description:
+  Displays all details of a selected contact.
+        """,
+    
+    "find": """
+Command: find
+Usage:
+  find <query>           Search in all fields
+  find <digits> phone    Search only by phone
+  find <text> email      Search only by email
+
+Description:
+  Searches contacts by any text or specific fields.
+        """,
+    
+    "delete": """
+Command: delete
+Usage:
+  delete <name>
+
+Description:
+  Removes the contact entirely from your address book.
+        """,
+    
+    "update": """
+Command: update
+Usage:
+  update <name> <field> <value>
+
+Description:
+  Updates an existing field for the contact.
+        """,
+    
+    "remove": """
+Command: remove
+Usage:
+  remove <name> <field>
+
+Description:
+  Removes specific field (phone/email/address/birthday) from a contact.
+        """,
+    
+    "birthdays": """
+Command: birthdays
+Usage:
+  birthdays
+Then enter the number of days you want to see upcoming birthdays for.
+
+Description:
+  Shows contacts with upcoming birthdays within <days>.
+        """,
+    
+    "add-note": """
+Command: add-note
+Usage:
+  add-note <title> <text>
+
+Description:
+  Creates a new note.
+        """,
+    
+    "edit-note": """
+Command: edit-note
+Usage:
+  edit-note <id> <text>
+
+Description:
+  Edits an existing note.
+        """,
+    
+    "find-notes": """
+Command: find-notes
+Usage:
+  find-notes <keyword>
+
+Description:
+  Searches notes that contain given keyword.
+        """,
+    
+    "all-notes": """
+Command: all-notes
+Usage:
+  all-notes
+
+Description:
+  Shows list of all notes.
+        """,
+    
+    "delete-note": """
+Command: delete-note
+Usage:
+  delete-note <id>
+
+Description:
+  Deletes a note by its ID.
+        """
+}
