@@ -1,3 +1,4 @@
+from bot.utils import parse_input, print_help
 import prompt_toolkit
 from bot.decorators import input_error, user_exists
 from bot.utils import parse_input
@@ -356,6 +357,7 @@ def handle_command(user_input: str, book: AddressBook, notes: Notes):
         "add": lambda: add_contact(args, book),
         "all": lambda: show_all(book),
         "birthdays": lambda: get_upcoming_birthdays(args, book),
+        "help": lambda: print_help(args),
         "show": lambda: show_contact(args, book),
         "find": lambda: find_contacts(args, book),
         "delete": lambda: delete_contact(args, book),

@@ -10,7 +10,7 @@ def run_bot():
     book = load_from_json('users.json', USERS_DATA)
     notes = load_from_json('notes.json', NOTES_DATA)
 
-    print_help()
+    print_help(args=[])
     
     try:
         while True:
