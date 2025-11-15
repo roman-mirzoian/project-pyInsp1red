@@ -11,8 +11,7 @@ def print_help(args):
     \033[1m=== Available Commands ===\033[0m
     
     - help <command>                     Show help for a specific command
-                                         If there are no <command>, show all available commands
-                                         
+                                         If there are no <command>, show all available commands                    
 
     \033[94m[Contact Management]\033[0m
     - hello                              Display a greeting
