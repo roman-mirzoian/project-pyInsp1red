@@ -500,6 +500,14 @@ def delete_note(args, notes: Notes) -> str:
     return f"The note for '{user_name}' has been deleted."
 
 
+def _format_note_output(note_info: dict) -> str:
+    user = note_info.get('user', 'Unknown')
+    note_id = note_info.get('id', '?')
+    text = note_info.get('text', '')
+    
+    return f"{'':<4}User: {user}, #{note_id}: {text}\n"
+
+
 def find_notes_by_tag(args, notes: Notes) -> str:
     tag_to_find = args[0]
     
@@ -511,8 +519,7 @@ def find_notes_by_tag(args, notes: Notes) -> str:
     search_message = f"Found notes with tag '{tag_to_find}':\n"
     
     for note_info in all_notes_by_tag[tag_to_find]:
-        search_message += f"{'':<4}User: {note_info['user']}, "
-        search_message += f"#{note_info['id']}: {note_info['text']}\n"
+        search_message += _format_note_output(note_info)
     
     return search_message
 
@@ -531,7 +538,6 @@ def sort_notes_by_tag(notes: Notes) -> str:
         search_message += f"\n  [Tag: {tag}]\n"
         
         for note_info in all_notes_by_tag[tag]:
-            search_message += f"{'':<4}User: {note_info['user']}, "
-            search_message += f"#{note_info['id']}: {note_info['text']}\n"
+            search_message += _format_note_output(note_info)
     
     return search_message

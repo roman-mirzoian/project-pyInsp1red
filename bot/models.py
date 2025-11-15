@@ -261,14 +261,14 @@ class Notes(UserDict):
 
         return False
     
-    def find_and_group_by_tag(self) -> dict:
+    def group_notes_by_tag(self) -> dict:
         notes_by_tag = defaultdict(list)
 
         for user_name, notes in self.data.items():
             for note_id, note_data in notes.items():
                 tag = note_data.get("tag")
                 if tag is None or tag == "":
-                    tag = "Без тегу"
+                    tag = "No tag"
                 
                 notes_by_tag[tag].append({
                     "user": user_name,
