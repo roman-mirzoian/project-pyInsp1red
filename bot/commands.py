@@ -399,10 +399,15 @@ def add_note(args, notes: Notes) -> str:
     
     tag = None
     note_text_parts = []
-
-    if text_parts and text_parts[0].startswith("tag="):
-        tag = text_parts[0][4:] 
-        note_text_parts = text_parts[1:] 
+    
+    if text_parts:
+        parts = text_parts[0].split("=", 1) 
+        
+        if len(parts) == 2 and parts[0] == "tag":
+            tag = parts[1]
+            note_text_parts = text_parts[1:]
+        else:
+            note_text_parts = text_parts
     else:
         note_text_parts = text_parts
 
@@ -426,14 +431,24 @@ def find_notes(args, notes: Notes) -> str:
         return f"'{note_part}' not found in any notes."
 
     search_message = "Here are the search matches:\n"
-    for user_name, notes in search_result.items():
+    for user_name, notes_list in search_result.items():
         search_message += f"{'':<4}{user_name}: \n"
-        for note in notes:
-            search_message += f"{'':<8}#{note['id']}: {note['text']}\n"
+        
+        for note in notes_list:
+            text = note.get("text", "")
+            tag = note.get("tag")
+            
+            note_display = ""
+            if tag:
+                note_display += f"[Tag: {tag}] "
+            
+            note_display += f"#{note['id']}: {text}" 
+            search_message += f"{'':<8}{note_display}\n"
 
     return search_message
 
 
+@input_error
 def all_user_notes(args, notes: Notes) -> str:
     user_name = args[0]
 
@@ -446,10 +461,11 @@ def all_user_notes(args, notes: Notes) -> str:
         text = note_data.get("text", "")
         tag = note_data.get("tag")
 
-        note_display = f"#{note_id}: {text}"
+        note_display = ""
         if tag:
-            note_display += f" [Tag: {tag}]" 
-        
+            note_display += f"[Tag: {tag}] "
+            
+        note_display += f"#{note_id}: {text}"
         notes_message += f"{'':<4}{note_display}\n"
 
     return notes_message

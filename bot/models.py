@@ -207,7 +207,11 @@ class Notes(UserDict):
             for note_id, note_data in notes.items():
                 text = note_data.get("text", "") 
                 if note_text in text:
-                    result[user_name].append({"id": note_id, "text": text})
+                    result[user_name].append({
+                        "id": note_id, 
+                        "text": text,
+                        "tag": note_data.get("tag")
+                    })
 
         return dict(result)
 
