@@ -489,7 +489,8 @@ def _format_note_output(note_info: dict) -> str:
 @input_error
 def find_notes_by_tag(args, notes: Notes) -> str:
     tag_to_find = args[0]
-    all_notes_by_tag = notes.find_and_group_by_tag()
+    
+    all_notes_by_tag = notes.group_notes_by_tag()
 
     if tag_to_find not in all_notes_by_tag:
         return f"Notes with tag '{tag_to_find}' not found."
