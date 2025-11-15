@@ -1,8 +1,8 @@
 import prompt_toolkit
+from bot.decorators import input_error, user_exists
 from bot.utils import parse_input
-from bot.models import Notes, Record
+from bot.models import AddressBook, Notes, Record
 from bot.constants import (
-    ERROR_NO_COMMAND,
     ERROR_INSUFFICIENT_ARGS,
     ERROR_CONTACT_NOT_FOUND,
     ERROR_PHONE_NOT_FOUND,
@@ -27,37 +27,6 @@ from bot.constants import (
     INFO_NO_CONTACTS,
     DATE_FORMAT,
 )
-
-
-# Decorator to handle input errors
-def input_error(func):
-    def inner(args, book_or_notes):
-        # No command entered
-        if args is None:
-            return ERROR_NO_COMMAND
-
-        # Check for specific command errors
-        if func.__name__ in ("add_birthday", "add_email",
-                             "add_address", "update_phone", "update_birthday",
-                             "update_email", "update_address", "remove_phone"):
-            if len(args) < 2:
-                return ERROR_INSUFFICIENT_ARGS
-        elif func.__name__ in ("delete_contact", "show_contact", "all_user_notes",                  "find_notes_by_tag"):
-            if len(args) < 1:
-                return ERROR_INSUFFICIENT_ARGS
-
-        # Handle exceptions from the command functions
-        try:
-            return func(args, book_or_notes)
-        except ValueError as e:
-            return f"Error: {e}"
-        except KeyError:
-            return ERROR_CONTACT_NOT_FOUND
-        except Exception as e:
-            return f"Unexpected error: {e}"
-
-    return inner
-
 
 @input_error
 def add_contact(args, book):
@@ -154,9 +123,9 @@ def show_all(book):
 
 
 @input_error
-def show_contact(args, book):
+@user_exists
+def show_contact(args, book: AddressBook):
     name = args[0]
-
     record = book.find(name)
 
     if record is None:
@@ -196,7 +165,7 @@ def show_contact(args, book):
 
 
 @input_error
-def find_contacts(args, book):
+def find_contacts(args, book: AddressBook):
     if len(args) < 1:
         return ERROR_INSUFFICIENT_ARGS
 
@@ -273,22 +242,20 @@ def find_contacts(args, book):
 
     return "\n".join(str(record) for record in results)
 
-
 @input_error
-def delete_contact(args, book):
+@user_exists
+def delete_contact(args, book: AddressBook):
     name = args[0]
-
     record = book.find(name)
-
     if record is None:
         return ERROR_CONTACT_NOT_FOUND
 
     book.delete(name)
     return SUCCESS_CONTACT_DELETED
 
-
 @input_error
-def update_contact(args, book):
+@user_exists
+def update_contact(args, book: AddressBook):
     if len(args) < 3:
         return ERROR_INSUFFICIENT_ARGS
 
@@ -326,9 +293,9 @@ def update_contact(args, book):
     else:
         return f"Unknown field: {field}. Available: phone, birthday, email, address"
 
-
 @input_error
-def remove_field(args, book):
+@user_exists
+def remove_field(args, book: AddressBook):
     if len(args) < 1:
         return ERROR_INSUFFICIENT_ARGS
 
@@ -380,11 +347,12 @@ def remove_field(args, book):
         return f"Unknown field: {field}. Available: phone, birthday, email, address"
 
 
-def handle_command(user_input: str, book, notes: Notes):
+def handle_command(user_input: str, book: AddressBook, notes: Notes):
     command, *args = parse_input(user_input)
 
     commands = {
         "hello": lambda: "How can I help you?",
+        # book commands
         "add": lambda: add_contact(args, book),
         "all": lambda: show_all(book),
         "birthdays": lambda: get_upcoming_birthdays(args, book),
@@ -393,12 +361,13 @@ def handle_command(user_input: str, book, notes: Notes):
         "delete": lambda: delete_contact(args, book),
         "update": lambda: update_contact(args, book),
         "remove": lambda: remove_field(args, book),
-        "add-note": lambda: add_note(args, notes),
-        "edit-note": lambda: edit_note(args, notes),
-        "find-notes": lambda: find_notes(args, notes),
-        "all-notes": lambda: all_user_notes(args, notes),
-        "delete-note": lambda: delete_note(args, notes),
-        "find-tag": lambda: find_notes_by_tag(args, notes),
+        # note commands
+        "add-note": lambda: add_note(args, book=book, notes=notes),
+        "edit-note": lambda: edit_note(args, book=book, notes=notes),
+        "find-notes": lambda: find_notes(args, notes=notes),
+        "all-notes": lambda: all_user_notes(args, book=book, notes=notes),
+        "delete-note": lambda: delete_note(args, book=book, notes=notes),
+        "find-tag": lambda: find_notes_by_tag(args, notes=notes),
         "sort-notes": lambda: sort_notes_by_tag(notes),
     }
 
@@ -411,8 +380,9 @@ def handle_command(user_input: str, book, notes: Notes):
     else:
         return f"Invalid command: {command}"
 
-
-def add_note(args, notes: Notes) -> str:
+@input_error
+@user_exists
+def add_note(args, book: AddressBook, notes: Notes) -> str:
     user_name, *text_parts = args
     
     tag = None
@@ -430,13 +400,12 @@ def add_note(args, notes: Notes) -> str:
         note_text_parts = text_parts
 
     note_text = " ".join(note_text_parts)
-
-    # TODO: add user existence check
     note_id = notes.add_note(user_name, note_text, tag) 
 
     return f"A new note with ID {note_id} for '{user_name}' has been added."
 
-
+@input_error
+@user_exists
 def edit_note(args, notes: Notes):
     user_name, note_id  = args
     all_user_notes = notes.get_all_user_notes(user_name)
@@ -449,7 +418,7 @@ def edit_note(args, notes: Notes):
         return "The note was not edited, check the username and note ID."
     return f"The note #{note_id} for '{user_name}' has been updated."
 
-
+@input_error
 def find_notes(args, notes: Notes) -> str:
     note_part = " ".join(args)
 
@@ -477,11 +446,9 @@ def find_notes(args, notes: Notes) -> str:
 
 
 @input_error
-def all_user_notes(args, notes: Notes) -> str:
+@user_exists
+def all_user_notes(args, book: AddressBook, notes: Notes) -> str:
     user_name = args[0]
-
-    # TODO: add user existence check
-
     user_notes = notes.get_all_user_notes(user_name)
 
     notes_message = f"Here are all the notes from user '{user_name}':\n"
@@ -498,11 +465,10 @@ def all_user_notes(args, notes: Notes) -> str:
 
     return notes_message
 
-
-def delete_note(args, notes: Notes) -> str:
+@input_error
+@user_exists
+def delete_note(args, book: AddressBook, notes: Notes) -> str:
     user_name, note_id = args
-
-    # TODO: add user existence check
     is_note_deleted = notes.delete_note(user_name, note_id)
     if not is_note_deleted:
         return "The note was not deleted, check the username and note ID."
@@ -520,7 +486,6 @@ def _format_note_output(note_info: dict) -> str:
 
 def find_notes_by_tag(args, notes: Notes) -> str:
     tag_to_find = args[0]
-    
     all_notes_by_tag = notes.find_and_group_by_tag()
 
     if tag_to_find not in all_notes_by_tag:
@@ -532,7 +497,6 @@ def find_notes_by_tag(args, notes: Notes) -> str:
         search_message += _format_note_output(note_info)
     
     return search_message
-
 
 def sort_notes_by_tag(notes: Notes) -> str:
     all_notes_by_tag = notes.find_and_group_by_tag()
