@@ -1,3 +1,4 @@
+import prompt_toolkit
 from bot.utils import parse_input
 from bot.models import Notes, Record
 from bot.constants import (
@@ -437,7 +438,16 @@ def add_note(args, notes: Notes) -> str:
 
 
 def edit_note(args, notes: Notes):
-    pass
+    user_name, note_id  = args
+    all_user_notes = notes.get_all_user_notes(user_name)
+    editing_note = all_user_notes.get(note_id, {})
+    text_for_edit = editing_note.get("text", "")
+    new_text = prompt_toolkit.prompt("Enter the new note text: ", default=text_for_edit)
+    
+    note_id = notes.edit_note(user_name, note_id, new_text)
+    if not note_id:
+        return "The note was not edited, check the username and note ID."
+    return f"The note #{note_id} for '{user_name}' has been updated."
 
 
 def find_notes(args, notes: Notes) -> str:
