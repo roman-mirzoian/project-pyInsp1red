@@ -264,6 +264,23 @@ class Notes(UserDict):
 
         return False
     
+    def group_notes_by_tag(self) -> dict:
+        notes_by_tag = defaultdict(list)
+
+        for user_name, notes in self.data.items():
+            for note_id, note_data in notes.items():
+                tag = note_data.get("tag")
+                if tag is None or tag == "":
+                    tag = "No tag"
+                
+                notes_by_tag[tag].append({
+                    "user": user_name,
+                    "id": note_id,
+                    "text": note_data.get("text", "")
+                })
+
+        return dict(notes_by_tag)
+    
     def to_dict(self):
         return dict(self.data)
 

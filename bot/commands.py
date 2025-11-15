@@ -42,7 +42,7 @@ def input_error(func):
                              "update_email", "update_address", "remove_phone"):
             if len(args) < 2:
                 return ERROR_INSUFFICIENT_ARGS
-        elif func.__name__ in ("delete_contact", "show_contact", "all_user_notes"):
+        elif func.__name__ in ("delete_contact", "show_contact", "all_user_notes",                  "find_notes_by_tag"):
             if len(args) < 1:
                 return ERROR_INSUFFICIENT_ARGS
 
@@ -398,6 +398,8 @@ def handle_command(user_input: str, book, notes: Notes):
         "find-notes": lambda: find_notes(args, notes),
         "all-notes": lambda: all_user_notes(args, notes),
         "delete-note": lambda: delete_note(args, notes),
+        "find-tag": lambda: find_notes_by_tag(args, notes),
+        "sort-notes": lambda: sort_notes_by_tag(notes),
     }
 
     if command in ("close", "exit"):
@@ -465,7 +467,8 @@ def find_notes(args, notes: Notes) -> str:
             if tag:
                 note_display += f"[Tag: {tag}] "
             
-            note_display += f"#{note['id']}: {text}" 
+            note_display += f"#{note['id']}: {text}"
+            
             search_message += f"{'':<8}{note_display}\n"
 
     return search_message
@@ -503,3 +506,46 @@ def delete_note(args, notes: Notes) -> str:
         return "The note was not deleted, check the username and note ID."
 
     return f"The note for '{user_name}' has been deleted."
+
+
+def _format_note_output(note_info: dict) -> str:
+    user = note_info.get('user', 'Unknown')
+    note_id = note_info.get('id', '?')
+    text = note_info.get('text', '')
+    
+    return f"{'':<4}User: {user}, #{note_id}: {text}\n"
+
+
+def find_notes_by_tag(args, notes: Notes) -> str:
+    tag_to_find = args[0]
+    
+    all_notes_by_tag = notes.find_and_group_by_tag()
+
+    if tag_to_find not in all_notes_by_tag:
+        return f"Notes with tag '{tag_to_find}' not found."
+
+    search_message = f"Found notes with tag '{tag_to_find}':\n"
+    
+    for note_info in all_notes_by_tag[tag_to_find]:
+        search_message += _format_note_output(note_info)
+    
+    return search_message
+
+
+def sort_notes_by_tag(notes: Notes) -> str:
+    all_notes_by_tag = notes.find_and_group_by_tag()
+
+    if not all_notes_by_tag:
+        return "No notes found."
+
+    sorted_tags = sorted(all_notes_by_tag.keys())
+
+    search_message = "All notes, sorted by tag:\n"
+
+    for tag in sorted_tags:
+        search_message += f"\n  [Tag: {tag}]\n"
+        
+        for note_info in all_notes_by_tag[tag]:
+            search_message += _format_note_output(note_info)
+    
+    return search_message
