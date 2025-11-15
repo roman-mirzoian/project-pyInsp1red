@@ -1,4 +1,4 @@
-from bot.utils import parse_input
+from bot.utils import parse_input, print_help
 from bot.models import Notes, Record
 from bot.constants import (
     ERROR_NO_COMMAND,
@@ -387,6 +387,7 @@ def handle_command(user_input: str, book, notes: Notes):
         "add": lambda: add_contact(args, book),
         "all": lambda: show_all(book),
         "birthdays": lambda: get_upcoming_birthdays(args, book),
+        "help": lambda: print_help(args),
         "show": lambda: show_contact(args, book),
         "find": lambda: find_contacts(args, book),
         "delete": lambda: delete_contact(args, book),

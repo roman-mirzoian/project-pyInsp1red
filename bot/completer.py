@@ -15,11 +15,13 @@ completer = WordCompleter(
         "delete",
         "update",
         "remove",
+        "birthdays",
         "add-note",
         "edit-note",
         "find-notes",
         "all-notes",
         "delete-note",
+        "help",
         "close",
         "exit"
     ],
