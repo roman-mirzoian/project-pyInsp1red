@@ -484,6 +484,7 @@ def _format_note_output(note_info: dict) -> str:
     return f"{'':<4}User: {user}, #{note_id}: {text}\n"
 
 
+@input_error
 def find_notes_by_tag(args, notes: Notes) -> str:
     tag_to_find = args[0]
     all_notes_by_tag = notes.find_and_group_by_tag()
@@ -499,7 +500,7 @@ def find_notes_by_tag(args, notes: Notes) -> str:
     return search_message
 
 def sort_notes_by_tag(notes: Notes) -> str:
-    all_notes_by_tag = notes.find_and_group_by_tag()
+    all_notes_by_tag = notes.group_notes_by_tag()
 
     if not all_notes_by_tag:
         return "No notes found."
