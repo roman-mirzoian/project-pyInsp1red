@@ -41,7 +41,7 @@ def input_error(func):
                              "update_email", "update_address", "remove_phone"):
             if len(args) < 2:
                 return ERROR_INSUFFICIENT_ARGS
-        elif func.__name__ in ("delete_contact", "show_contact"):
+        elif func.__name__ in ("delete_contact", "show_contact", "all_user_notes"):
             if len(args) < 1:
                 return ERROR_INSUFFICIENT_ARGS
 
@@ -410,10 +410,26 @@ def handle_command(user_input: str, book, notes: Notes):
 
 
 def add_note(args, notes: Notes) -> str:
-    user_name, *text = args
+    user_name, *text_parts = args
+    
+    tag = None
+    note_text_parts = []
+    
+    if text_parts:
+        parts = text_parts[0].split("=", 1) 
+        
+        if len(parts) == 2 and parts[0] == "tag":
+            tag = parts[1]
+            note_text_parts = text_parts[1:]
+        else:
+            note_text_parts = text_parts
+    else:
+        note_text_parts = text_parts
+
+    note_text = " ".join(note_text_parts)
 
     # TODO: add user existence check
-    note_id = notes.add_note(user_name, " ".join(text))
+    note_id = notes.add_note(user_name, note_text, tag) 
 
     return f"A new note with ID {note_id} for '{user_name}' has been added."
 
@@ -430,14 +446,24 @@ def find_notes(args, notes: Notes) -> str:
         return f"'{note_part}' not found in any notes."
 
     search_message = "Here are the search matches:\n"
-    for user_name, notes in search_result.items():
+    for user_name, notes_list in search_result.items():
         search_message += f"{'':<4}{user_name}: \n"
-        for note in notes:
-            search_message += f"{'':<8}#{note['id']}: {note['text']}\n"
+        
+        for note in notes_list:
+            text = note.get("text", "")
+            tag = note.get("tag")
+            
+            note_display = ""
+            if tag:
+                note_display += f"[Tag: {tag}] "
+            
+            note_display += f"#{note['id']}: {text}" 
+            search_message += f"{'':<8}{note_display}\n"
 
     return search_message
 
 
+@input_error
 def all_user_notes(args, notes: Notes) -> str:
     user_name = args[0]
 
@@ -446,8 +472,16 @@ def all_user_notes(args, notes: Notes) -> str:
     user_notes = notes.get_all_user_notes(user_name)
 
     notes_message = f"Here are all the notes from user '{user_name}':\n"
-    for note_id, note in user_notes.items():
-        notes_message += f"{'':<4}#{note_id}: {note}\n"
+    for note_id, note_data in user_notes.items():
+        text = note_data.get("text", "")
+        tag = note_data.get("tag")
+
+        note_display = ""
+        if tag:
+            note_display += f"[Tag: {tag}] "
+            
+        note_display += f"#{note_id}: {text}"
+        notes_message += f"{'':<4}{note_display}\n"
 
     return notes_message
 
