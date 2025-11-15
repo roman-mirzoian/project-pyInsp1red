@@ -26,7 +26,7 @@ def print_help():
     
     \033[93m[Note Management]\033[0m
     - add-note <user_name <text>         Add a new note
-    - edit-note <user_name> <id> <text>  Edit existing note
+    - edit-note <user_name> <id>         Edit existing note
     - find-notes <keyword>               Search notes by keyword
     - all-notes <user_name>              Show all notes
     - delete-note <user_name> <id>       Delete a note
