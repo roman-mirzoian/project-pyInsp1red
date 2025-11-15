@@ -459,7 +459,8 @@ def find_notes(args, notes: Notes) -> str:
             if tag:
                 note_display += f"[Tag: {tag}] "
             
-            note_display += f"#{note['id']}: {text}" 
+            note_display += f"#{note['id']}: {text}"
+            
             search_message += f"{'':<8}{note_display}\n"
 
     return search_message
