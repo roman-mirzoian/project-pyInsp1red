@@ -448,7 +448,7 @@ def add_note(args, book: AddressBook, notes: Notes) -> str:
 
 @input_error
 @user_exists
-def edit_note(args, notes: Notes):
+def edit_note(args, book: AddressBook, notes: Notes):
     """
     Edit text of an existing note for a given user and note ID.
     Prompts user with the current text as default and saves the updated version.
