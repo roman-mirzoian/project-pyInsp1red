@@ -43,26 +43,24 @@ DATE_FORMAT = "%d.%m.%Y"
 
 # Help messages
 MAIN_HELP_TEXT = """
-\033[1m** Available Commands **\033[0m
+\033[36;1m** Available Commands **\033[0m
 
-- help <command>                    Show help for a specific command
-                                    If there are no <command>, show all available commands                    
+- help <command>                     Show help for a specific command
+                                     If there are no <command>, show all available commands                    
 
 \033[94m[Contact Management]\033[0m
 - hello                              Display a greeting
 - add <name>                         Add a new contact
-- add <name> <phone>                 Add contact with phone
-- add <name> <field> <value>         Add field to contact (phone, email, address, birthday)
+  - add <name> <phone>               Add contact with phone
+  - add <name> <field> <value>       Add field to contact (phone, email, address, birthday)
 - all                                Show all contacts
 - birthdays                          Show upcoming birthdays
 - show <name>                        Show contact details
 - update <name> <field> <value>      Update contact field
 - delete <name>                      Delete a contact
 - remove <name> <field>              Remove field from contact
-- find <query> [field]               Search contacts (case insensitive)
-                                        - find <query> (search all fields)
-                                        - find <query> phone (search phone only)
-                                        - find <query> email (search email only)
+- find <query>                       Search contacts (case insensitive)
+  - find <query> [field]             Search in specified field (phone, email, address, birthday)
 
 \033[93m[Note Management]\033[0m
 - add-note <user_name> tag=<tag> <text>   Add a new note for a user
@@ -116,11 +114,14 @@ Description:
 Command: find
 Usage:
   find <query>           Search in all fields
-  find <digits> phone    Search only by phone
-  find <text> email      Search only by email
+  find <query> [field]   Search only in specified field (phone, email, address, birthday)
 
 Description:
   Searches contacts by any text or specific fields.
+  
+Examples:
+  find 0987654321
+  find 0987654321 phone
         """,
     
     "delete": """
@@ -148,6 +149,11 @@ Usage:
 
 Description:
   Removes specific field (phone/email/address/birthday) from a contact.
+  If 
+
+Examples:
+  remove John birthday
+  remove john phone 0987654321
         """,
     
     "birthdays": """
@@ -198,6 +204,7 @@ Usage:
 
 Description:
   Searches notes that contain given keyword.
+  If you do not enter a <keyword>, all notes will be displayed.
         """,
     
     "all-notes": """
