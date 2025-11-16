@@ -11,7 +11,6 @@ completer = WordCompleter(
         "hello",
         "add",
         "all",
-        "birthdays",
         "show",
         "find",
         "delete",
