@@ -1,7 +1,6 @@
 from bot.utils import Log, parse_input, print_help
 import prompt_toolkit
 from bot.decorators import input_error, user_exists
-from bot.utils import parse_input
 from bot.models import AddressBook, Notes, Record
 from bot.constants import (
     ERROR_INSUFFICIENT_ARGS,
