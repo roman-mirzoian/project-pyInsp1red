@@ -1,4 +1,4 @@
-from bot.utils import parse_input, print_help
+from bot.utils import Log, parse_input, print_help
 import prompt_toolkit
 from bot.decorators import input_error, user_exists
 from bot.utils import parse_input
@@ -108,7 +108,15 @@ def get_upcoming_birthdays(args, book: AddressBook):
     Ask user for a days range and fetch upcoming birthdays from the book.
     Returns a formatted multiline string with names and congratulation dates or a fallback message.
     """
-    days_limit = int(input("How many days ahead should you search? "))
+    while True:
+        user_input = input("How many days ahead should you search? ")
+
+        try:
+            days_limit = int(user_input)
+            break
+        except ValueError:
+            Log.warning("Please enter a valid integer.")
+    
     birthdays = book.get_upcoming_birthdays(days_limit)
     if not birthdays:
         return "There are no birthdays in the selected period."

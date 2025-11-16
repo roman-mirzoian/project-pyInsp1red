@@ -71,12 +71,17 @@ class Log:
         cls._print(message, "error")
 
 def log_result(result: str):
-    formatted_result = result.lower()
-    if "error" in formatted_result:
+    text = result.lower()
+
+    error_keywords = ["error"]
+    warning_keywords = ["not found", "unknown", "please", "invalid"]
+    info_keywords = ["sorry"]
+
+    if any(word in text for word in error_keywords):
         Log.error(result)
-    elif "not found" in formatted_result or "unknown" in formatted_result:
+    elif any(word in text for word in warning_keywords):
         Log.warning(result)
-    elif "sorry" in formatted_result:
+    elif any(word in text for word in info_keywords):
         Log.info(result)
     else:
         Log.success(result)
