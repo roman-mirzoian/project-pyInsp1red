@@ -59,7 +59,7 @@ MAIN_HELP_TEXT = """
 - update <name> <field> <value>      Update contact field
 - delete <name>                      Delete a contact
 - remove <name> <field>              Remove field from contact
-- find [field] <query>               Search contacts (case insensitive)
+- find <query> [field]               Search contacts (case insensitive)
                                         - find <query> (search all fields)
                                         - find <query> phone (search phone only)
                                         - find <query> email (search email only)
