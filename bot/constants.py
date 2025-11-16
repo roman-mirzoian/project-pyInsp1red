@@ -11,10 +11,11 @@ ERROR_PHONE_NOT_FOUND = "Sorry, phone number not found"
 ERROR_BIRTHDAY_NOT_FOUND = "Sorry, birthday not found"
 ERROR_EMAIL_NOT_FOUND = "Sorry, email not found"
 ERROR_ADDRESS_NOT_FOUND = "Sorry, address not found"
-ERROR_INVALID_PHONE = "Sorry, invalid phone number, must be 10 digits"
+ERROR_INVALID_PHONE = "Sorry, invalid phone number, must be 10 digits and start with '380'"
 ERROR_INVALID_EMAIL = "Sorry, invalid email address"
 ERROR_INVALID_DATE = "Sorry, invalid date format, must be DD.MM.YYYY"
 ERROR_EMPTY_NAME = "Sorry, name cannot be empty"
+ERROR_NAME_TOO_SHORT = "Error: Name must be at least 2 characters long."
 ERROR_INVALID_NAME_LETTERS = "Name must be a single word containing only letters"
 ERROR_EMPTY_ADDRESS = "Sorry, address cannot be empty"
 
@@ -40,6 +41,9 @@ INFO_NO_CONTACTS = "No contacts"
 
 # Date format
 DATE_FORMAT = "%d.%m.%Y"
+
+# Number format
+UKRAINE_CODE = "380"
 
 # Help messages
 MAIN_HELP_TEXT = """
