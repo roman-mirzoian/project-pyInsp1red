@@ -74,7 +74,7 @@ def log_result(result: str):
     text = result.lower()
 
     error_keywords = ["error"]
-    warning_keywords = ["not found", "unknown", "please", "invalid"]
+    warning_keywords = ["not found", "unknown", "please", "invalid", "not exist"]
     info_keywords = ["sorry"]
 
     if any(word in text for word in error_keywords):

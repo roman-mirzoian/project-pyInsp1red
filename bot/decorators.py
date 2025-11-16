@@ -57,7 +57,7 @@ def user_exists(func):
             user_name = args[0]
             user = book.find(user_name)
             if not user:
-                return f"User '{user_name}' does note exist."
+                return f"User '{user_name}' does not exist."
             return func(args, book=book, notes=notes)
         except Exception as e:
             return f"Unexpected error: {e}"
