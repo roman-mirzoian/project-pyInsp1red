@@ -304,8 +304,12 @@ def update_contact(args, book: AddressBook, notes=Notes):
         return ERROR_CONTACT_NOT_FOUND
 
     if field in ("phone", "phones"):
-        old_phone = args[2]
-        new_phone = args[3]
+        try:
+            old_phone = args[2]
+            new_phone = args[3]
+        except IndexError:
+            return "Please enter command arguments"
+        
         for i, phone_obj in enumerate(record.phones):
             if phone_obj.value == old_phone:
                 record.phones[i] = phone_obj.__class__(new_phone)
