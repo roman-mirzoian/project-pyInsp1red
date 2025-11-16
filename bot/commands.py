@@ -30,7 +30,7 @@ from bot.constants import (
 )
 
 @input_error
-def add_contact(args, book):
+def add_contact(args, book: AddressBook):
     """
     Add a contact to the address book using the given args and book.
     Supports: just name, name + phone, or name + field (phone, birthday, email, address) + value.
@@ -103,7 +103,7 @@ def add_contact(args, book):
 
 
 @input_error
-def get_upcoming_birthdays(args, book):
+def get_upcoming_birthdays(args, book: AddressBook):
     """
     Ask user for a days range and fetch upcoming birthdays from the book.
     Returns a formatted multiline string with names and congratulation dates or a fallback message.
@@ -120,7 +120,7 @@ def get_upcoming_birthdays(args, book):
     return "\n".join(birthdays_message)
 
 
-def show_all(book):
+def show_all(book: AddressBook):
     """
     Return a formatted list of all contacts stored in the address book.
     If the book is empty, returns an informational message instead.
@@ -137,7 +137,7 @@ def show_all(book):
 
 @input_error
 @user_exists
-def show_contact(args, book: AddressBook):
+def show_contact(args, book: AddressBook, notes: Notes):
     """
     Show full info about a contact or a specific field for a given name.
     Supports fields: phone, birthday, email, address; returns formatted text.
@@ -265,7 +265,7 @@ def find_contacts(args, book: AddressBook):
 
 @input_error
 @user_exists
-def delete_contact(args, book: AddressBook):
+def delete_contact(args, book: AddressBook, notes: Notes):
     """
     Delete a contact from the address book by name.
     Returns a success message or an error if the contact is not found.
@@ -280,7 +280,7 @@ def delete_contact(args, book: AddressBook):
 
 @input_error
 @user_exists
-def update_contact(args, book: AddressBook):
+def update_contact(args, book: AddressBook, notes=Notes):
     """
     Update one field of an existing contact (phone, birthday, email, address).
     Expects: name, field name, and new value; returns a status message.
@@ -324,7 +324,7 @@ def update_contact(args, book: AddressBook):
 
 @input_error
 @user_exists
-def remove_field(args, book: AddressBook):
+def remove_field(args, book: AddressBook, notes: Notes):
     """
     Remove a whole contact or a specific field value from it.
     Supports removing phone, birthday, email, or address, based on args.
@@ -378,45 +378,6 @@ def remove_field(args, book: AddressBook):
 
     else:
         return f"Unknown field: {field}. Available: phone, birthday, email, address"
-
-
-def handle_command(user_input: str, book: AddressBook, notes: Notes):
-    """
-    Parse raw user input into a command and its args, then dispatch it.
-    Uses a mapping of command names to handler functions for contacts and notes.
-    """
-    command, *args = parse_input(user_input)
-
-    commands = {
-        "hello": lambda: "How can I help you?",
-        # book commands
-        "add": lambda: add_contact(args, book),
-        "all": lambda: show_all(book),
-        "birthdays": lambda: get_upcoming_birthdays(args, book),
-        "help": lambda: print_help(args),
-        "show": lambda: show_contact(args, book),
-        "find": lambda: find_contacts(args, book),
-        "delete": lambda: delete_contact(args, book),
-        "update": lambda: update_contact(args, book),
-        "remove": lambda: remove_field(args, book),
-        # note commands
-        "add-note": lambda: add_note(args, book=book, notes=notes),
-        "edit-note": lambda: edit_note(args, book=book, notes=notes),
-        "find-notes": lambda: find_notes(args, notes=notes),
-        "all-notes": lambda: all_user_notes(args, book=book, notes=notes),
-        "delete-note": lambda: delete_note(args, book=book, notes=notes),
-        "find-tag": lambda: find_notes_by_tag(args, notes=notes),
-        "sort-notes": lambda: sort_notes_by_tag(notes),
-    }
-
-    if command in ("close", "exit"):
-        return "exit"
-
-    func = commands.get(command)
-    if func:
-        return func()
-    else:
-        return f"Invalid command: {command}"
 
 @input_error
 @user_exists
@@ -586,3 +547,41 @@ def sort_notes_by_tag(notes: Notes) -> str:
             search_message += _format_note_output(note_info)
     
     return search_message
+
+def handle_command(user_input: str, book: AddressBook, notes: Notes):
+    """
+    Parse raw user input into a command and its args, then dispatch it.
+    Uses a mapping of command names to handler functions for contacts and notes.
+    """
+    command, *args = parse_input(user_input)
+
+    commands = {
+        "hello": lambda: "How can I help you?",
+        "help": lambda: print_help(args),
+        # book commands
+        "add": lambda: add_contact(args, book),
+        "all": lambda: show_all(book),
+        "birthdays": lambda: get_upcoming_birthdays(args, book),
+        "show": lambda: show_contact(args, book=book, notes=notes),
+        "find": lambda: find_contacts(args, book),
+        "delete": lambda: delete_contact(args, book, notes=notes),
+        "update": lambda: update_contact(args, book=book, notes=notes),
+        "remove": lambda: remove_field(args, book=book, notes=notes),
+        # note commands
+        "add-note": lambda: add_note(args, book=book, notes=notes),
+        "edit-note": lambda: edit_note(args, book=book, notes=notes),
+        "find-notes": lambda: find_notes(args, notes=notes),
+        "all-notes": lambda: all_user_notes(args, book=book, notes=notes),
+        "delete-note": lambda: delete_note(args, book=book, notes=notes),
+        "find-tag": lambda: find_notes_by_tag(args, notes=notes),
+        "sort-notes": lambda: sort_notes_by_tag(notes),
+    }
+
+    if command in ("close", "exit"):
+        return "exit"
+
+    func = commands.get(command)
+    if func:
+        return func()
+    else:
+        return f"Invalid command: {command}"

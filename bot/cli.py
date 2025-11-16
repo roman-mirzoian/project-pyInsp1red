@@ -1,9 +1,9 @@
 from bot.commands import handle_command
-from bot.models import Notes
-from bot.utils import print_help
+from bot.utils import Log, log_result, print_help
 from bot.completer import session
 from bot.constants import NOTES_DATA, USERS_DATA
 from bot.storage import load_from_json, save_to_json
+from time import sleep
 
 def run_bot():
     """
@@ -27,10 +27,12 @@ def run_bot():
             if result == "exit":
                 break
             elif result is not None:
-                print(result)
+                log_result(result)
     except KeyboardInterrupt:
-        print("\nOops! Looks like you want to quit. Saving your data...")
+        Log.warning("Oops! Looks like you want to quit. Saving your data...")
+        # a little delay just for fun
+        sleep(1)
     finally:
         save_to_json(book, 'users.json')
         save_to_json(notes, 'notes.json')
-        print("See you next time!")
+        Log.success("See you next time!")

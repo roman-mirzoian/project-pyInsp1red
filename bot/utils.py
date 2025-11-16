@@ -1,3 +1,4 @@
+from colorama import Fore, init
 from bot.constants import HELP_MESSAGES, MAIN_HELP_TEXT
 
 def parse_input(user_input: str):
@@ -24,3 +25,58 @@ def print_help(args):
         print(message)
     else:
         print(f"No help available for '{cmd}'.")
+
+
+init(autoreset=True)
+class Log:
+    """
+    Utility logger for printing colored messages to the console.
+    Provides simple methods for info, success, and error outputs
+    using colorama formatting.
+    """
+    COLORS = {
+        "info": Fore.BLUE,
+        "success": Fore.GREEN,
+        "warning": Fore.YELLOW,
+        "error": Fore.RED,
+    }
+
+    PREFIXES = {
+        "info": "",
+        "success": "",
+        "warning": "[WARN] ",
+        "error": "[ERROR] ",
+    }
+
+    @classmethod
+    def _print(cls, message, level):
+        color = cls.COLORS.get(level, Fore.WHITE)
+        prefix = cls.PREFIXES.get(level, "")
+        print(f"{color}{prefix}{message}")
+
+    @classmethod
+    def info(cls, message):
+        cls._print(message, "info")
+
+    @classmethod
+    def success(cls, message):
+        cls._print(message, "success")
+
+    @classmethod
+    def warning(cls, message):
+        cls._print(message, "warning")
+
+    @classmethod
+    def error(cls, message):
+        cls._print(message, "error")
+
+def log_result(result: str):
+    formatted_result = result.lower()
+    if "error" in formatted_result:
+        Log.error(result)
+    elif "not found" in formatted_result or "unknown" in formatted_result:
+        Log.warning(result)
+    elif "sorry" in formatted_result:
+        Log.info(result)
+    else:
+        Log.success(result)

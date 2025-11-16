@@ -268,7 +268,7 @@ class AddressBook(UserDict):
         key = record.name.value.capitalize()
         self.data[key] = record
 
-    def find(self, name):
+    def find(self, name) -> Record:
         """
         Find a contact record by name in a case-insensitive way.
         Returns a Record instance or None if not found.
