@@ -304,12 +304,13 @@ def update_contact(args, book: AddressBook, notes=Notes):
         return ERROR_CONTACT_NOT_FOUND
 
     if field in ("phone", "phones"):
-        new_phone = args[2]
-        if not record.phones:
-            return ERROR_PHONE_NOT_FOUND
-        # Update the first phone number
-        record.phones[0] = record.phones[0].__class__(new_phone)
-        return SUCCESS_PHONE_UPDATED
+        old_phone = args[2]
+        new_phone = args[3]
+        for i, phone_obj in enumerate(record.phones):
+            if phone_obj.value == old_phone:
+                record.phones[i] = phone_obj.__class__(new_phone)
+                return SUCCESS_PHONE_UPDATED
+        return ERROR_PHONE_NOT_FOUND
 
     elif field == "birthday":
         new_birthday = args[2]

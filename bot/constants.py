@@ -137,19 +137,26 @@ Description:
 Command: update
 Usage:
   update <name> <field> <value>
+  update <name> <field> <old_number> <new_number>
 
 Description:
   Updates an existing field for the contact.
+  If you want to update a <field> phone, you need to enter which number you will update.
+        
+Examples:        
+  update john birthday 12.11.2000    
+  update john phone 3333333333 5555555555      
         """,
     
     "remove": """
 Command: remove
 Usage:
   remove <name> <field>
+  remove <name> <field_phone> <number>
 
 Description:
   Removes specific field (phone/email/address/birthday) from a contact.
-  If 
+  If you want to delete a <field> phone, you need to enter which number you will delete.
 
 Examples:
   remove John birthday
