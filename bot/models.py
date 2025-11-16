@@ -8,8 +8,10 @@ from bot.constants import (
     ERROR_EMPTY_NAME,
     ERROR_INVALID_NAME_LETTERS,
     ERROR_EMPTY_ADDRESS,
+    ERROR_NAME_TOO_SHORT,
     ERROR_PHONE_EXISTS,
-    DATE_FORMAT
+    DATE_FORMAT,
+    UKRAINE_CODE
 )
 
 class Field:
@@ -44,6 +46,9 @@ class Name(Field):
         if not value.strip():
             raise ValueError(ERROR_EMPTY_NAME)
         
+        if len(value) < 2:
+            raise ValueError(ERROR_NAME_TOO_SHORT)
+        
         # Check that name is a single word containing only letters
         if not re.match(r'^[a-zA-Z]+$', value.strip()):
             raise ValueError(ERROR_INVALID_NAME_LETTERS)
@@ -56,12 +61,12 @@ class Phone(Field):
     Represents a phone number field for a contact.
     Validates that the phone consists of exactly 10 digits.
     """
-    def __init__(self, value):
+    def __init__(self, value: str):
         """
         Validate the phone number format and store it.
         Raises ValueError if the number is not 10 digits.
         """
-        if len(value) != 10 or not value.isdigit():
+        if len(value) != 10 or not value.isdigit() or not value.startswith(UKRAINE_CODE):
             raise ValueError(ERROR_INVALID_PHONE)
         super().__init__(value)
 
