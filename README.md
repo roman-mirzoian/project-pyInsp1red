@@ -10,7 +10,7 @@ It helps you store detailed contact information and create user-specific notes. 
 
 * **Contact Management:** Add, edit, delete, and search contacts.
 * **Note Management:** Add, edit, delete, and search notes by content or tags.
-* **Birthday Reminders:** Get a list of upcoming birthdays.
+* **Birthday Reminders:** Get a user list of upcoming birthdays.
 * **Data Persistence:** All information is saved locally on your disk.
 * **Command Autocompletion:** Suggestions for commands are provided as you type.
 * **Error Handling:** The bot handles incorrect input without crashing.
@@ -68,7 +68,7 @@ Here is a list of the main commands you can use.
 * `add <name> <phone>`: Adds a new contact with a name and phone.
 * `add <name> <field> <value>`: Adds a specific field (phone, email, address, birthday) to a contact.
 * `all`: Shows all contacts in the address book.
-* `birthdays [days]`: Shows birthdays happening in the next 7 days. You can optionally specify a different number of `days`.
+* `birthdays`: Shows upcoming birthdays. The program will then ask for the number of days to look ahead.
 * `show <name>`: Shows detailed information for a specific contact.
 * `find <query>`: Finds contacts by name, phone, or email (case-insensitive).
 * `delete <name>`: Deletes a contact from the address book.
@@ -77,7 +77,7 @@ Here is a list of the main commands you can use.
 
 ### Note Management
 
-* `add-note <user_name> <text> [tag]`: Adds a new note for a user. The `tag` is optional.
+* `add-note <user_name> <tag=> <text>`: Adds a new note for a user. The `tag` is optional.
 * `edit-note <note_id>`: Edits an existing note.
 * `find-notes <keyword>`: Finds notes by searching the text content.
 * `find-tag <tag>`: Finds all notes matching a specific tag.
