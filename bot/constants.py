@@ -61,8 +61,8 @@ MAIN_HELP_TEXT = """
 - remove <name> <field>              Remove field from contact
 - find [field] <query>               Search contacts (case insensitive)
                                         - find <query> (search all fields)
-                                        - find phone <query> (search phone only)
-                                        - find email <query> (search email only)
+                                        - find <query> phone (search phone only)
+                                        - find <query> email (search email only)
 
 \033[93m[Note Management]\033[0m
 - add-note <user_name> tag=<tag> <text>   Add a new note for a user
