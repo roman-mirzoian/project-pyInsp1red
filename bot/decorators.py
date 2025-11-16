@@ -24,6 +24,7 @@ def input_error(func):
                              "update_email", "update_address", "remove_phone"):
             if len(args) < 2:
                 return ERROR_INSUFFICIENT_ARGS
+
         elif func.__name__ in ("delete_contact", "show_contact", "all_user_notes",                  "find_notes_by_tag"):
             if len(args) < 1:
                 return ERROR_INSUFFICIENT_ARGS
