@@ -1,8 +1,8 @@
 # Personal Assistant Bot
 
-This is an educational project for a command-line interface (CLI) assistant.
+A command-line interface (CLI) assistant to help you manage your personal data.
 
-It helps you manage your contacts and notes. The application runs locally and saves all data to JSON files (`users.json`, `notes.json`) in the `data` directory.
+It helps you store detailed contact information and create user-specific notes. The application runs locally.
 
 ---
 
@@ -11,7 +11,7 @@ It helps you manage your contacts and notes. The application runs locally and sa
 * **Contact Management:** Add, edit, delete, and search contacts.
 * **Note Management:** Add, edit, delete, and search notes by content or tags.
 * **Birthday Reminders:** Get a list of upcoming birthdays.
-* **Data Persistence:** All contacts and notes are saved locally.
+* **Data Persistence:** All information is saved locally on your disk.
 * **Command Autocompletion:** Suggestions for commands are provided as you type.
 * **Error Handling:** The bot handles incorrect input without crashing.
 
@@ -54,7 +54,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     python main.py
     ```
 2.  Once the bot is running, it will display a "Welcome..." message.
-3.  Type `help` to see all available commands.
+3.  Type `help` to see all available commands, or `help <command>` for details on a specific command.
 4.  To exit the bot, type `close` or `exit`.
 
 ---
@@ -65,11 +65,10 @@ Here is a list of the main commands you can use.
 
 ### Contact Management
 
-* `hello`: Displays a greeting.
 * `add <name> <phone>`: Adds a new contact with a name and phone.
 * `add <name> <field> <value>`: Adds a specific field (phone, email, address, birthday) to a contact.
 * `all`: Shows all contacts in the address book.
-* `birthdays`: Shows birthdays happening in the next week.
+* `birthdays [days]`: Shows birthdays happening in the next 7 days. You can optionally specify a different number of `days`.
 * `show <name>`: Shows detailed information for a specific contact.
 * `find <query>`: Finds contacts by name, phone, or email (case-insensitive).
 * `delete <name>`: Deletes a contact from the address book.
@@ -78,7 +77,7 @@ Here is a list of the main commands you can use.
 
 ### Note Management
 
-* `add-note <user_name> <tag> <text>`: Adds a new note for a user with tags.
+* `add-note <user_name> <text> [tag]`: Adds a new note for a user. The `tag` is optional.
 * `edit-note <note_id>`: Edits an existing note.
 * `find-notes <keyword>`: Finds notes by searching the text content.
 * `find-tag <tag>`: Finds all notes matching a specific tag.
@@ -88,5 +87,7 @@ Here is a list of the main commands you can use.
 
 ### General
 
+* `hello`: Displays a greeting.
 * `help`: Shows the full list of available commands.
+* `help <command>`: Shows detailed help for a specific command.
 * `close` / `exit`: Exits the application.
