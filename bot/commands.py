@@ -31,6 +31,10 @@ from bot.constants import (
 
 @input_error
 def add_contact(args, book):
+    """
+    Add a contact to the address book using the given args and book.
+    Supports: just name, name + phone, or name + field (phone, birthday, email, address) + value.
+    """
     if len(args) < 1:
         return ERROR_INSUFFICIENT_ARGS
 
@@ -100,6 +104,10 @@ def add_contact(args, book):
 
 @input_error
 def get_upcoming_birthdays(args, book):
+    """
+    Ask user for a days range and fetch upcoming birthdays from the book.
+    Returns a formatted multiline string with names and congratulation dates or a fallback message.
+    """
     days_limit = int(input("How many days ahead should you search? "))
     birthdays = book.get_upcoming_birthdays(days_limit)
     if not birthdays:
@@ -113,6 +121,10 @@ def get_upcoming_birthdays(args, book):
 
 
 def show_all(book):
+    """
+    Return a formatted list of all contacts stored in the address book.
+    If the book is empty, returns an informational message instead.
+    """
     if not book.data:
         return INFO_NO_CONTACTS
 
@@ -126,6 +138,10 @@ def show_all(book):
 @input_error
 @user_exists
 def show_contact(args, book: AddressBook):
+    """
+    Show full info about a contact or a specific field for a given name.
+    Supports fields: phone, birthday, email, address; returns formatted text.
+    """
     name = args[0]
     record = book.find(name)
 
@@ -167,6 +183,10 @@ def show_contact(args, book: AddressBook):
 
 @input_error
 def find_contacts(args, book: AddressBook):
+    """
+    Search contacts in the address book by substring in all fields or a specific field.
+    Returns formatted matches or a message if nothing is found.
+    """
     if len(args) < 1:
         return ERROR_INSUFFICIENT_ARGS
 
@@ -246,6 +266,10 @@ def find_contacts(args, book: AddressBook):
 @input_error
 @user_exists
 def delete_contact(args, book: AddressBook):
+    """
+    Delete a contact from the address book by name.
+    Returns a success message or an error if the contact is not found.
+    """
     name = args[0]
     record = book.find(name)
     if record is None:
@@ -257,6 +281,10 @@ def delete_contact(args, book: AddressBook):
 @input_error
 @user_exists
 def update_contact(args, book: AddressBook):
+    """
+    Update one field of an existing contact (phone, birthday, email, address).
+    Expects: name, field name, and new value; returns a status message.
+    """
     if len(args) < 3:
         return ERROR_INSUFFICIENT_ARGS
 
@@ -297,6 +325,10 @@ def update_contact(args, book: AddressBook):
 @input_error
 @user_exists
 def remove_field(args, book: AddressBook):
+    """
+    Remove a whole contact or a specific field value from it.
+    Supports removing phone, birthday, email, or address, based on args.
+    """
     if len(args) < 1:
         return ERROR_INSUFFICIENT_ARGS
 
@@ -349,6 +381,10 @@ def remove_field(args, book: AddressBook):
 
 
 def handle_command(user_input: str, book: AddressBook, notes: Notes):
+    """
+    Parse raw user input into a command and its args, then dispatch it.
+    Uses a mapping of command names to handler functions for contacts and notes.
+    """
     command, *args = parse_input(user_input)
 
     commands = {
@@ -385,6 +421,10 @@ def handle_command(user_input: str, book: AddressBook, notes: Notes):
 @input_error
 @user_exists
 def add_note(args, book: AddressBook, notes: Notes) -> str:
+    """
+    Create a new note for a user, optionally with a 'tag=...' prefix.
+    Returns a message with the newly created note ID.
+    """
     user_name, *text_parts = args
     
     tag = None
@@ -409,6 +449,10 @@ def add_note(args, book: AddressBook, notes: Notes) -> str:
 @input_error
 @user_exists
 def edit_note(args, notes: Notes):
+    """
+    Edit text of an existing note for a given user and note ID.
+    Prompts user with the current text as default and saves the updated version.
+    """
     user_name, note_id  = args
     all_user_notes = notes.get_all_user_notes(user_name)
     editing_note = all_user_notes.get(note_id, {})
@@ -422,6 +466,10 @@ def edit_note(args, notes: Notes):
 
 @input_error
 def find_notes(args, notes: Notes) -> str:
+    """
+    Search notes by a text fragment across all users.
+    Returns a grouped, formatted list of matches or a not-found message.
+    """
     note_part = " ".join(args)
 
     search_result = notes.find_notes(note_part)
@@ -446,10 +494,13 @@ def find_notes(args, notes: Notes) -> str:
 
     return search_message
 
-
 @input_error
 @user_exists
 def all_user_notes(args, book: AddressBook, notes: Notes) -> str:
+    """
+    Return all notes for a specific user in a readable list.
+    Each note line includes optional tag, ID and text.
+    """
     user_name = args[0]
     user_notes = notes.get_all_user_notes(user_name)
 
@@ -470,6 +521,10 @@ def all_user_notes(args, book: AddressBook, notes: Notes) -> str:
 @input_error
 @user_exists
 def delete_note(args, book: AddressBook, notes: Notes) -> str:
+    """
+    Delete a specific note for a user by note ID.
+    Returns a success message or an error if the note/user is invalid.
+    """
     user_name, note_id = args
     is_note_deleted = notes.delete_note(user_name, note_id)
     if not is_note_deleted:
@@ -479,6 +534,10 @@ def delete_note(args, book: AddressBook, notes: Notes) -> str:
 
 
 def _format_note_output(note_info: dict) -> str:
+    """
+    Format a single note entry into a human-readable string.
+    Includes user name, note ID and note text aligned with basic indentation.
+    """
     user = note_info.get('user', 'Unknown')
     note_id = note_info.get('id', '?')
     text = note_info.get('text', '')
@@ -488,6 +547,10 @@ def _format_note_output(note_info: dict) -> str:
 
 @input_error
 def find_notes_by_tag(args, notes: Notes) -> str:
+    """
+    Find notes grouped by tag and return those matching the given tag.
+    Shows all notes under that tag or a message if none exist.
+    """
     tag_to_find = args[0]
     
     all_notes_by_tag = notes.group_notes_by_tag()
@@ -503,6 +566,10 @@ def find_notes_by_tag(args, notes: Notes) -> str:
     return search_message
 
 def sort_notes_by_tag(notes: Notes) -> str:
+    """
+    Group all notes by their tags and show them in sorted tag order.
+    Returns a multiline string with sections per tag and formatted notes.
+    """
     all_notes_by_tag = notes.group_notes_by_tag()
 
     if not all_notes_by_tag:

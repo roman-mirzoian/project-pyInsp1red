@@ -43,10 +43,10 @@ DATE_FORMAT = "%d.%m.%Y"
 
 # Help messages
 MAIN_HELP_TEXT = """
-\033[1m=== Available Commands ===\033[0m
+\033[1m** Available Commands **\033[0m
 
-- help <command>                     Show help for a specific command
-                                        If there are no <command>, show all available commands                    
+- help <command>                    Show help for a specific command
+                                    If there are no <command>, show all available commands                    
 
 \033[94m[Contact Management]\033[0m
 - hello                              Display a greeting
@@ -63,16 +63,15 @@ MAIN_HELP_TEXT = """
                                         - find <query> (search all fields)
                                         - find phone <query> (search phone only)
                                         - find email <query> (search email only)
-- birthdays <days>                   Show upcoming birthdays within <days>
 
 \033[93m[Note Management]\033[0m
-- add-note <user_name> <text>        Add a new note for a user
-- edit-note <user_name> <id>         Edit existing note
-- find-notes <keyword>               Search notes by keyword
-- find-tag <tag>                     Find notes by tag
-- sort-notes                         Show notes sorted/grouped by tag
-- all-notes <user_name>              Show all notes for a user
-- delete-note <user_name> <id>       Delete a note
+- add-note <user_name> tag=<tag> <text>   Add a new note for a user
+- edit-note <user_name> <id>              Edit existing note
+- find-notes <keyword>                    Search notes by keyword
+- find-tag <tag>                          Find notes by tag
+- sort-notes                              Show notes sorted/grouped by tag
+- all-notes <user_name>                   Show all notes for a user
+- delete-note <user_name> <note_id>       Delete a note
 
 \033[91m[Exit]\033[0m
 - close / exit                       Exit the application
@@ -164,19 +163,32 @@ Description:
     "add-note": """
 Command: add-note
 Usage:
-  add-note <title> <text>
+  add-note <user_name> <text>
+  add-note <user_name> tag=<tag> <text>
 
 Description:
-  Creates a new note.
+  Creates a new note for the specified user. 
+  You can optionally add a tag using the prefix tag=<value>.
+  The command returns the ID of the newly created note.
+
+Examples:
+  add-note John Buy milk
+  add-note Anna tag=work Finish the report
         """,
     
     "edit-note": """
 Command: edit-note
 Usage:
-  edit-note <id> <text>
+  edit-note <user_name> <note_id>
 
 Description:
-  Edits an existing note.
+  Edits the text of an existing note for the specified user. 
+  When executed, the current text of the note is shown as default, allowing you 
+  to modify it interactively. After editing, the updated note is saved.
+
+Examples:
+  edit-note John 1
+  edit-note Anna 3
         """,
     
     "find-notes": """
@@ -191,18 +203,44 @@ Description:
     "all-notes": """
 Command: all-notes
 Usage:
-  all-notes
+  all-notes <user_name>
 
 Description:
-  Shows list of all notes.
+  Shows all notes that belong to the specified user.
         """,
     
     "delete-note": """
 Command: delete-note
 Usage:
-  delete-note <id>
+  delete-note <user_name> <note_id>
 
 Description:
-  Deletes a note by its ID.
+  Deletes a specific note belonging to the given user by its ID.
+  If the user or note ID is invalid, an error message is shown.
+
+Examples:
+  delete-note John 2
+  delete-note Anna 5
+        """,
+
+    "sort-notes": """
+Command: sort-notes
+Usage:
+  sort-notes
+
+Description:
+  Groups all notes by their tags and displays them in alphabetical (sorted) 
+  order. Each tag is shown as a category, followed by the notes that contain
+  this tag.
+        """,
+
+      "find-tag": """
+Command: find-tag
+Usage:
+  find-tag <tag>
+
+Description:
+  Searches notes by a specific tag. Shows all notes that contain the given tag.
+  If no notes with this tag exist, displays a message indicating that none were found.
         """
 }

@@ -6,10 +6,15 @@ from bot.constants import NOTES_DATA, USERS_DATA
 from bot.storage import load_from_json, save_to_json
 
 def run_bot():
+    """
+    Run the interactive Personal Assistant bot loop:
+    loads data, processes user commands, and saves before exit.
+    """
 
     book = load_from_json('users.json', USERS_DATA)
     notes = load_from_json('notes.json', NOTES_DATA)
 
+    print("\n\033[32;1m=== Welcome to your Personal Assistant Bot! ===\033[0m\n")
     print_help(args=[])
     
     try:

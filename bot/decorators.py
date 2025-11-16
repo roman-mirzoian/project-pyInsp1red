@@ -3,7 +3,17 @@ from bot.models import AddressBook, Notes
 
 # Decorator to handle input errors
 def input_error(func):
+    """
+    Decorator for command handlers that normalizes common input errors.
+    Wraps a function, checks arguments count and catches typical exceptions,
+    returning user-friendly error messages instead of tracebacks.
+    """
     def inner(*args, **kwargs):
+        """
+        Wrapper that validates arguments for the wrapped command
+        and handles ValueError/KeyError/other exceptions, mapping them
+        to readable error strings for the CLI user.
+        """
         # No command entered
         if args is None:
             return ERROR_NO_COMMAND
@@ -32,7 +42,17 @@ def input_error(func):
 
 # Decorator to check user exists
 def user_exists(func):
+    """
+    Decorator for note- and contact-related commands that require an existing user.
+    It looks up the first argument as a username in the AddressBook and aborts
+    the call with a message if the user is not found.
+    """
     def inner(args, book: AddressBook, notes: Notes):
+        """
+        Wrapper that verifies the user from args[0] exists in the AddressBook.
+        If the user is missing, returns an error string; otherwise calls the
+        wrapped function with the same arguments.
+        """
         try:
             user_name = args[0]
             user = book.find(user_name)

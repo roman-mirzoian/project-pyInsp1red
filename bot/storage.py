@@ -36,6 +36,11 @@ def create_empty_data(data_type: str):
 
 
 def load_from_json(filename: str, data_type: str):
+    """
+    Load data from a JSON file and convert it into the proper model.
+    Returns an AddressBook or Notes instance depending on data_type, or
+    a fresh empty object if the file is missing or corrupted.
+    """
     file_path = DATA_DIR / filename
 
     try:
