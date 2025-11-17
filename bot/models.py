@@ -66,7 +66,7 @@ class Phone(Field):
         Validate the phone number format and store it.
         Raises ValueError if the number is not 10 digits.
         """
-        if len(value) != 10 or not value.isdigit() or not value.startswith(UKRAINE_CODE):
+        if len(value) != 12 or not value.isdigit() or not value.startswith(UKRAINE_CODE):
             raise ValueError(ERROR_INVALID_PHONE)
         super().__init__(value)
 
