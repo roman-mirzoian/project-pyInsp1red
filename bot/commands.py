@@ -52,7 +52,7 @@ def add_contact(args, book: AddressBook):
 
     # Case 2: add John 1231231231 - create contact + add phone
     # Check if second arg is a phone number (10 digits)
-    if len(args) == 2 and args[1].isdigit() and len(args[1]) == 10:
+    if len(args) == 2 and args[1].isdigit() and len(args[1]) == 12:
         record = book.find(name)
         if record is None:
             # Capitalize name for consistency
