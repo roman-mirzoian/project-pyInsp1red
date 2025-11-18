@@ -59,12 +59,12 @@ class Name(Field):
 class Phone(Field):
     """
     Represents a phone number field for a contact.
-    Validates that the phone consists of exactly 10 digits.
+    Validates that the phone consists of exactly 12 digits.
     """
     def __init__(self, value: str):
         """
         Validate the phone number format and store it.
-        Raises ValueError if the number is not 10 digits.
+        Raises ValueError if the number is not 12 digits.
         """
         if len(value) != 12 or not value.isdigit() or not value.startswith(UKRAINE_CODE):
             raise ValueError(ERROR_INVALID_PHONE)
